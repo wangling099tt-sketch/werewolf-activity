@@ -1,10 +1,13 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Play, Users, Settings, Swords, Zap, Trophy, 
-  ChevronRight, Star, Crown, Sparkles, LogIn
+  ChevronRight, Star, Crown, Sparkles, LogIn, List
 } from 'lucide-react';
 import { useState } from 'react';
 import { getAvatarUrl } from '../hooks/useDiscordSdk';
+import { HowToPlay } from '../components/HowToPlay';
+import { RoomBrowser } from '../components/RoomBrowser';
+import { sound } from '../utils/sound';
 
 interface LobbyScreenProps {
   discord: { user: any; status: string };
@@ -28,6 +31,8 @@ export default function LobbyScreen({ discord, onCreateRoom, onJoinRoom, connect
   const avatarUrl = user ? getAvatarUrl(user.id, user.avatar) : '';
   const [showJoinInput, setShowJoinInput] = useState(false);
   const [roomCode, setRoomCode] = useState('');
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
+  const [showRoomBrowser, setShowRoomBrowser] = useState(false);
 
   return (
     <motion.div 
@@ -152,12 +157,26 @@ export default function LobbyScreen({ discord, onCreateRoom, onJoinRoom, connect
           )}
         </motion.div>
 
+        {/* Browse Rooms */}
+        <motion.button
+          className="wv-btn-secondary text-lg py-4 px-8 w-full"
+          variants={itemVariants}
+          whileHover={{ scale: 1.02, y: -2 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => { sound.play('click'); setShowRoomBrowser(true); }}
+        >
+          <List className="w-6 h-6" />
+          <span>Browse Rooms</span>
+          <Users className="w-5 h-5 ml-auto opacity-50" />
+        </motion.button>
+
         {/* How to Play */}
         <motion.button
           className="wv-btn-ghost text-lg py-4 px-8 w-full"
           variants={itemVariants}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
+          onClick={() => { sound.play('click'); setShowHowToPlay(true); }}
         >
           <Sparkles className="w-6 h-6" />
           <span>How to Play</span>
@@ -166,9 +185,9 @@ export default function LobbyScreen({ discord, onCreateRoom, onJoinRoom, connect
 
       {/* Quick Stats */}
       <motion.div 
-        className="grid grid-cols-3 gap-4 w-full max-w-md"
-        variants={containerVariants}
-      >
+          className="grid grid-cols-3 gap-4 w-full max-w-md"
+          variants={containerVariants}
+        >
         <motion.div 
           className="wv-card text-center p-4"
           variants={itemVariants}
@@ -199,6 +218,21 @@ export default function LobbyScreen({ discord, onCreateRoom, onJoinRoom, connect
           <p className="text-xs text-wv-text-dim">Roles</p>
         </motion.div>
       </motion.div>
+
+      {/* How to Play Modal */}
+      <AnimatePresence>
+        {showHowToPlay && <HowToPlay onClose={() => setShowHowToPlay(false)} />}
+      </AnimatePresence>
+
+      {/* Room Browser Modal */}
+      <AnimatePresence>
+        {showRoomBrowser && (
+          <RoomBrowser 
+            onClose={() => setShowRoomBrowser(false)} 
+            onJoinRoom={(id) => { setShowRoomBrowser(false); onJoinRoom(id); }}
+          />
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }
