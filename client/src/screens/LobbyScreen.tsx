@@ -1,23 +1,21 @@
 import { motion } from 'framer-motion';
 import { 
   Play, Users, Settings, Swords, Zap, Trophy, 
-  ChevronRight, Star, Crown, Sparkles 
+  ChevronRight, Star, Crown, Sparkles, LogIn
 } from 'lucide-react';
+import { useState } from 'react';
 import { getAvatarUrl } from '../hooks/useDiscordSdk';
 
 interface LobbyScreenProps {
   discord: { user: any; status: string };
-  onNavigate: (screen: 'lobby' | 'room' | 'game') => void;
-  gameState: any;
-  setGameState: any;
+  onCreateRoom: () => void;
+  onJoinRoom: (roomId: string) => void;
+  connected: boolean;
 }
 
 const containerVariants = {
   hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.1 }
-  }
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
 };
 
 const itemVariants = {
@@ -25,9 +23,11 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
 };
 
-export default function LobbyScreen({ discord, onNavigate, gameState, setGameState }: LobbyScreenProps) {
+export default function LobbyScreen({ discord, onCreateRoom, onJoinRoom, connected }: LobbyScreenProps) {
   const user = discord.user;
   const avatarUrl = user ? getAvatarUrl(user.id, user.avatar) : '';
+  const [showJoinInput, setShowJoinInput] = useState(false);
+  const [roomCode, setRoomCode] = useState('');
 
   return (
     <motion.div 
@@ -37,9 +37,17 @@ export default function LobbyScreen({ discord, onNavigate, gameState, setGameSta
       animate="visible"
       exit={{ opacity: 0 }}
     >
-      {/* Header with User */}
+      {/* Connection Status */}
+      <motion.div 
+        className="absolute top-4 right-4 flex items-center gap-2"
+        variants={itemVariants}
+      >
+        <div className={`w-2 h-2 rounded-full ${connected ? 'bg-wv-success animate-pulse' : 'bg-wv-danger'}`} />
+        <span className="text-xs text-wv-text-dim">{connected ? 'Connected' : 'Connecting...'}</span>
+      </motion.div>
+
+      {/* Header */}
       <motion.div variants={itemVariants} className="mb-12 text-center">
-        {/* Animated Avatar */}
         <div className="relative inline-block mb-4">
           <motion.div 
             className="wv-avatar w-24 h-24"
@@ -54,14 +62,12 @@ export default function LobbyScreen({ discord, onNavigate, gameState, setGameSta
             </div>
           </motion.div>
           
-          {/* Status Ring Animation */}
           <motion.div 
             className="absolute -inset-2 rounded-full border-2 border-wv-primary/30"
             animate={{ rotate: 360 }}
             transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
           />
           
-          {/* Online Indicator */}
           <div className="wv-avatar-online" />
         </div>
         
@@ -76,7 +82,6 @@ export default function LobbyScreen({ discord, onNavigate, gameState, setGameSta
           {user?.username && user.username !== user?.globalName ? `@${user.username}` : ''}
         </motion.p>
         
-        {/* XP Badge */}
         <motion.div className="mt-3 inline-flex items-center gap-2" variants={itemVariants}>
           <div className="wv-badge-primary">
             <Zap className="w-4 h-4" />
@@ -94,44 +99,58 @@ export default function LobbyScreen({ discord, onNavigate, gameState, setGameSta
         className="flex flex-col gap-4 w-full max-w-md mb-8"
         variants={containerVariants}
       >
-        {/* Quick Match */}
+        {/* Quick Match / Create Room */}
         <motion.button
           className="wv-btn-primary text-lg py-4 px-8 w-full relative overflow-hidden group"
           variants={itemVariants}
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
-          onClick={() => {
-            setGameState({ ...gameState, players: [
-              { id: user?.id || '1', name: user?.globalName || 'You', avatar: avatarUrl, isReady: true, isHost: true },
-              { id: '2', name: 'Bot_Minh', avatar: '', isReady: true, isHost: false },
-              { id: '3', name: 'Bot_An', avatar: '', isReady: false, isHost: false },
-            ]});
-            onNavigate('room');
-          }}
+          onClick={onCreateRoom}
+          disabled={!connected}
         >
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
-            initial={{ x: '-100%' }}
-            whileHover={{ x: '100%' }}
-            transition={{ duration: 0.6 }}
-          />
           <Play className="w-6 h-6" />
-          <span>Quick Match</span>
-          <Star className="w-5 h-5 ml-auto opacity-50" />
+          <span>Create Room</span>
+          <Swords className="w-5 h-5 ml-auto opacity-50" />
         </motion.button>
 
-        {/* Create Custom Game */}
-        <motion.button
-          className="wv-btn-secondary text-lg py-4 px-8 w-full"
-          variants={itemVariants}
-          whileHover={{ scale: 1.02, y: -2 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => onNavigate('room')}
-        >
-          <Swords className="w-6 h-6" />
-          <span>Create Custom Room</span>
-          <ChevronRight className="w-5 h-5 ml-auto opacity-50" />
-        </motion.button>
+        {/* Join Room */}
+        <motion.div variants={itemVariants}>
+          {!showJoinInput ? (
+            <motion.button
+              className="wv-btn-secondary text-lg py-4 px-8 w-full"
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setShowJoinInput(true)}
+            >
+              <LogIn className="w-6 h-6" />
+              <span>Join Room</span>
+              <ChevronRight className="w-5 h-5 ml-auto opacity-50" />
+            </motion.button>
+          ) : (
+            <motion.div
+              className="wv-card flex gap-2"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <input
+                type="text"
+                placeholder="Room code (e.g. WV-ABC1)"
+                value={roomCode}
+                onChange={e => setRoomCode(e.target.value.toUpperCase())}
+                className="wv-input flex-1"
+                autoFocus
+              />
+              <motion.button
+                className="wv-btn-primary px-6"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => roomCode.trim() && onJoinRoom(roomCode.trim())}
+              >
+                Join
+              </motion.button>
+            </motion.div>
+          )}
+        </motion.div>
 
         {/* How to Play */}
         <motion.button
@@ -163,7 +182,7 @@ export default function LobbyScreen({ discord, onNavigate, gameState, setGameSta
         <motion.div 
           className="wv-card text-center p-4"
           variants={itemVariants}
-          whileHover={{ y: -5, boxShadow: '0 12px 40px rgba(253, 121, 168, 0.3)' }}
+          whileHover={{ y: -5 }}
         >
           <Users className="w-8 h-8 text-wv-accent mx-auto mb-2" />
           <p className="text-2xl font-bold text-wv-text">89%</p>
@@ -173,49 +192,13 @@ export default function LobbyScreen({ discord, onNavigate, gameState, setGameSta
         <motion.div 
           className="wv-card text-center p-4"
           variants={itemVariants}
-          whileHover={{ y: -5, boxShadow: '0 12px 40px rgba(0, 206, 201, 0.3)' }}
+          whileHover={{ y: -5 }}
         >
           <Star className="w-8 h-8 text-wv-accent-cyan mx-auto mb-2" />
           <p className="text-2xl font-bold text-wv-text">15</p>
-          <p className="text-xs text-wv-text-dim">Roles Mastered</p>
+          <p className="text-xs text-wv-text-dim">Roles</p>
         </motion.div>
       </motion.div>
-
-      {/* Bottom Nav */}
-      <motion.div 
-        className="fixed bottom-0 left-0 right-0 bg-glass-wv border-t border-white/10 p-4"
-        initial={{ y: 100 }}
-        animate={{ y: 0 }}
-        transition={{ delay: 0.3, type: 'spring' }}
-      >
-        <div className="flex justify-around max-w-lg mx-auto">
-          <NavButton icon={<Swords />} label="Play" active />
-          <NavButton icon={<Trophy />} label="Stats" />
-          <NavButton icon={<Settings />} label="Settings" />
-          <NavButton icon={<Users />} label="Friends" />
-        </div>
-      </motion.div>
     </motion.div>
-  );
-}
-
-function NavButton({ icon, label, active }: { icon: React.ReactNode; label: string; active?: boolean }) {
-  return (
-    <motion.button
-      className={`flex flex-col items-center gap-1 p-2 rounded-xl transition-colors ${
-        active ? 'text-wv-primary' : 'text-wv-text-dim hover:text-wv-text'
-      }`}
-      whileTap={{ scale: 0.9 }}
-      whileHover={{ scale: 1.1 }}
-    >
-      {icon}
-      <span className="text-xs font-medium">{label}</span>
-      {active && (
-        <motion.div 
-          className="absolute -top-1 w-8 h-1 bg-wv-primary rounded-full"
-          layoutId="activeTab"
-        />
-      )}
-    </motion.button>
   );
 }

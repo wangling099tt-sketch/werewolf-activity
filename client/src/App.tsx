@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Moon, Sun, Users, Swords, Crown, Play, Settings, User, MessageCircle, Star, Zap, Shield, Eye, Ghost } from 'lucide-react';
 import { useDiscordSdk } from './hooks/useDiscordSdk';
+import { useSocket, useSocketEvent } from './hooks/useSocket';
 import LobbyScreen from './screens/LobbyScreen';
 import GameRoomScreen from './screens/GameRoomScreen';
 import GameplayScreen from './screens/GameplayScreen';
@@ -12,42 +12,118 @@ export interface Player {
   id: string;
   name: string;
   avatar: string;
-  isReady: boolean;
+  alive: boolean;
   isHost: boolean;
-  role?: string;
-  isDead?: boolean;
+  connected?: boolean;
+  hasVoted?: boolean | null;
+  voteCount?: number | null;
 }
 
-export interface GameState {
-  phase: 'waiting' | 'role_reveal' | 'night' | 'day' | 'vote' | 'ended';
+export interface PublicState {
+  roomId: string;
+  phase: string;
   dayNumber: number;
-  timeRemaining: number;
   players: Player[];
-  myRole?: string;
+  log: string[];
+  votes: Record<string, string> | null;
+  winner: string | null;
+  timeRemaining: number | null;
+  roleDeck?: any;
+}
+
+export interface PrivateState {
+  myRole: string;
+  myTeam: string;
+  teammates: { id: string; name: string }[];
 }
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('loading');
-  const [gameState, setGameState] = useState<GameState>({
-    phase: 'waiting',
-    dayNumber: 1,
-    timeRemaining: 60,
-    players: [],
-  });
+  const [roomId, setRoomId] = useState<string>('');
+  const [publicState, setPublicState] = useState<PublicState | null>(null);
+  const [privateState, setPrivateState] = useState<PrivateState | null>(null);
+  const [inspectResult, setInspectResult] = useState<any>(null);
   
   const discord = useDiscordSdk();
+  const { socket, connected } = useSocket();
 
+  // Auto-login on Discord auth
   useEffect(() => {
-    if (discord.status === 'authenticated') {
+    if (discord.status === 'authenticated' && socket && connected && discord.user) {
+      socket.emit('auth:login', {
+        name: discord.user.globalName || discord.user.username,
+        id: discord.user.id,
+        avatar: discord.user.avatar,
+      });
       setScreen('lobby');
     }
-  }, [discord.status]);
+  }, [discord.status, socket, connected]);
+
+  // Listen for game state updates
+  useSocketEvent(socket, 'game:state', (state: PublicState) => {
+    setPublicState(state);
+    if (state.phase !== 'LOBBY' && screen !== 'game') {
+      setScreen('game');
+    } else if (state.phase === 'LOBBY' && screen === 'game') {
+      setScreen('room');
+    }
+  });
+
+  useSocketEvent(socket, 'lobby:update', (state: PublicState) => {
+    setPublicState(state);
+  });
+
+  useSocketEvent(socket, 'role:private', (state: PrivateState) => {
+    setPrivateState(state);
+  });
+
+  useSocketEvent(socket, 'private:inspect', (result: any) => {
+    setInspectResult(result);
+    setTimeout(() => setInspectResult(null), 5000);
+  });
 
   const navigateTo = (s: Screen) => setScreen(s);
 
+  const createRoom = () => {
+    if (!socket || !discord.user) return;
+    socket.emit('lobby:create', {
+      name: discord.user.globalName || discord.user.username,
+      id: discord.user.id,
+      avatar: discord.user.avatar,
+    }, (response: any) => {
+      if (response?.ok) {
+        setRoomId(response.roomId);
+        setScreen('room');
+      }
+    });
+  };
+
+  const joinRoom = (rid: string) => {
+    if (!socket || !discord.user) return;
+    socket.emit('lobby:join', {
+      roomId: rid,
+      name: discord.user.globalName || discord.user.username,
+      id: discord.user.id,
+      avatar: discord.user.avatar,
+    }, (response: any) => {
+      if (response?.ok) {
+        setRoomId(response.roomId);
+        setScreen('room');
+      } else {
+        alert(response?.error || 'Failed to join room');
+      }
+    });
+  };
+
+  const leaveRoom = () => {
+    if (socket) socket.emit('lobby:leave');
+    setScreen('lobby');
+    setPublicState(null);
+    setPrivateState(null);
+  };
+
   return (
     <div className="min-h-screen bg-wv-bg overflow-hidden">
-      {/* Background Particles */}
       <BackgroundParticles />
       
       <AnimatePresence mode="wait">
@@ -58,27 +134,31 @@ export default function App() {
           <LobbyScreen 
             key="lobby" 
             discord={discord} 
-            onNavigate={navigateTo}
-            gameState={gameState}
-            setGameState={setGameState}
+            onCreateRoom={createRoom}
+            onJoinRoom={joinRoom}
+            connected={connected}
           />
         )}
         {screen === 'room' && (
           <GameRoomScreen 
             key="room" 
             discord={discord} 
+            roomId={roomId}
+            publicState={publicState}
             onNavigate={navigateTo}
-            gameState={gameState}
-            setGameState={setGameState}
+            onLeave={leaveRoom}
+            socket={socket}
           />
         )}
         {screen === 'game' && (
           <GameplayScreen 
             key="game" 
             discord={discord} 
-            onNavigate={navigateTo}
-            gameState={gameState}
-            setGameState={setGameState}
+            publicState={publicState}
+            privateState={privateState}
+            inspectResult={inspectResult}
+            socket={socket}
+            onLeave={leaveRoom}
           />
         )}
       </AnimatePresence>
@@ -123,7 +203,6 @@ function LoadingScreen({ discord }: { discord: ReturnType<typeof useDiscordSdk> 
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {/* Animated Logo */}
       <motion.div
         className="relative w-32 h-32 mb-8"
         animate={{ 
@@ -137,9 +216,8 @@ function LoadingScreen({ discord }: { discord: ReturnType<typeof useDiscordSdk> 
       >
         <div className="absolute inset-0 bg-gradient-to-br from-wv-primary to-wv-accent rounded-full opacity-20 blur-xl" />
         <div className="absolute inset-4 bg-wv-bg-card rounded-full flex items-center justify-center border-4 border-wv-primary/50">
-          <Moon className="w-12 h-12 text-wv-primary" />
+          <span className="text-5xl">🐺</span>
         </div>
-        {/* Orbiting Stars */}
         {[0, 60, 120, 180, 240, 300].map((deg, i) => (
           <motion.div
             key={i}
@@ -153,7 +231,7 @@ function LoadingScreen({ discord }: { discord: ReturnType<typeof useDiscordSdk> 
             animate={{ opacity: [0.3, 1, 0.3] }}
             transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.25 }}
           >
-            <Star className="w-3 h-3 text-wv-gold fill-wv-gold" />
+            <span className="text-sm">⭐</span>
           </motion.div>
         ))}
       </motion.div>
@@ -171,12 +249,11 @@ function LoadingScreen({ discord }: { discord: ReturnType<typeof useDiscordSdk> 
         animate={{ opacity: [0.5, 1, 0.5] }}
         transition={{ duration: 1.5, repeat: Infinity }}
       >
-        {discord.status === 'loading' ? 'Connecting to Discord...' : 
-         discord.status === 'error' ? 'Connection failed. Retrying...' :
-         'Authenticated!'}
+        {discord.status === 'loading' ? '🐺 Connecting to Discord...' : 
+         discord.status === 'error' ? '⚠️ Connection failed. Retrying...' :
+         '✅ Authenticated!'}
       </motion.p>
 
-      {/* Loading Bar */}
       <div className="w-64 h-2 bg-wv-bg-deep rounded-full overflow-hidden">
         <motion.div
           className="h-full bg-gradient-to-r from-wv-primary to-wv-accent"
