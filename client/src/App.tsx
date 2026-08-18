@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDiscordSdk } from './hooks/useDiscordSdk';
 import { useSocket, useSocketEvent } from './hooks/useSocket';
+import { ToastProvider, useToast } from './components/Toast';
+import { MuteButton } from './hooks/useSettings';
+import { sound } from './utils/sound';
 import LobbyScreen from './screens/LobbyScreen';
 import GameRoomScreen from './screens/GameRoomScreen';
 import GameplayScreen from './screens/GameplayScreen';
@@ -38,11 +41,20 @@ export interface PrivateState {
 }
 
 export default function App() {
+  return (
+    <ToastProvider>
+      <GameApp />
+    </ToastProvider>
+  );
+}
+
+function GameApp() {
   const [screen, setScreen] = useState<Screen>('loading');
   const [roomId, setRoomId] = useState<string>('');
   const [publicState, setPublicState] = useState<PublicState | null>(null);
   const [privateState, setPrivateState] = useState<PrivateState | null>(null);
   const [inspectResult, setInspectResult] = useState<any>(null);
+  const { showToast } = useToast();
   
   const discord = useDiscordSdk();
   const { socket, connected } = useSocket();
@@ -59,11 +71,25 @@ export default function App() {
     }
   }, [discord.status, socket, connected]);
 
+  // Sound effects on phase changes
+  useEffect(() => {
+    if (!publicState?.phase) return;
+    const phase = publicState.phase;
+    sound.play(
+      phase === 'NIGHT' || phase === 'NIGHT_RESULTS' ? 'night' :
+      phase === 'DAY_DISCUSS' ? 'day' :
+      phase === 'DAY_VOTE' ? 'vote' :
+      phase === 'ENDED' ? (publicState.winner === 'town' ? 'win' : 'lose') :
+      'click'
+    );
+  }, [publicState?.phase, publicState?.winner]);
+
   // Listen for game state updates
   useSocketEvent(socket, 'game:state', (state: PublicState) => {
     setPublicState(state);
     if (state.phase !== 'LOBBY' && screen !== 'game') {
       setScreen('game');
+      sound.play('reveal');
     } else if (state.phase === 'LOBBY' && screen === 'game') {
       setScreen('room');
     }
@@ -75,10 +101,12 @@ export default function App() {
 
   useSocketEvent(socket, 'role:private', (state: PrivateState) => {
     setPrivateState(state);
+    if (state.myRole === 'werewolf') sound.play('reveal');
   });
 
   useSocketEvent(socket, 'private:inspect', (result: any) => {
     setInspectResult(result);
+    sound.play('reveal');
     setTimeout(() => setInspectResult(null), 5000);
   });
 
@@ -86,6 +114,7 @@ export default function App() {
 
   const createRoom = () => {
     if (!socket || !discord.user) return;
+    sound.play('click');
     socket.emit('lobby:create', {
       name: discord.user.globalName || discord.user.username,
       id: discord.user.id,
@@ -94,12 +123,16 @@ export default function App() {
       if (response?.ok) {
         setRoomId(response.roomId);
         setScreen('room');
+        showToast('success', `Room ${response.roomId} created!`);
+      } else {
+        showToast('error', response?.error || 'Failed to create room');
       }
     });
   };
 
   const joinRoom = (rid: string) => {
     if (!socket || !discord.user) return;
+    sound.play('click');
     socket.emit('lobby:join', {
       roomId: rid,
       name: discord.user.globalName || discord.user.username,
@@ -109,14 +142,17 @@ export default function App() {
       if (response?.ok) {
         setRoomId(response.roomId);
         setScreen('room');
+        showToast('success', `Joined room ${response.roomId}!`);
       } else {
-        alert(response?.error || 'Failed to join room');
+        showToast('error', response?.error || 'Failed to join room');
+        sound.play('click');
       }
     });
   };
 
   const leaveRoom = () => {
     if (socket) socket.emit('lobby:leave');
+    sound.play('click');
     setScreen('lobby');
     setPublicState(null);
     setPrivateState(null);
@@ -125,6 +161,7 @@ export default function App() {
   return (
     <div className="min-h-screen bg-wv-bg overflow-hidden">
       <BackgroundParticles />
+      <MuteButton />
       
       <AnimatePresence mode="wait">
         {screen === 'loading' && (

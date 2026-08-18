@@ -5,6 +5,9 @@ import {
 } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { getAvatarUrl } from '../hooks/useDiscordSdk';
+import { sound } from '../utils/sound';
+import { SlashOverlay, LightningBolt } from '../components/DeathAnimations';
+import { useToast } from '../components/Toast';
 import type { Socket } from 'socket.io-client';
 
 interface GameplayScreenProps {
@@ -43,13 +46,20 @@ export default function GameplayScreen({ discord, publicState, privateState, ins
   const [selectedTarget, setSelectedTarget] = useState<string | null>(null);
   const [chatInput, setChatInput] = useState('');
   const [showRoleReveal, setShowRoleReveal] = useState(false);
+  const [showDeathEffect, setShowDeathEffect] = useState(false);
+  const [previousAlive, setPreviousAlive] = useState<any[]>([]);
   const chatRef = useRef<HTMLDivElement>(null);
+  const { showToast } = useToast();
 
-  // Timer countdown
+  // Timer countdown + lightning on phase change
   useEffect(() => {
     setTimeLeft(phaseInfo.duration);
     if (phase === 'ROLE_REVEAL') {
       setShowRoleReveal(true);
+    }
+    if (phase === 'NIGHT') {
+      setShowDeathEffect(true);
+      setTimeout(() => setShowDeathEffect(false), 800);
     }
   }, [phase]);
 
@@ -66,6 +76,22 @@ export default function GameplayScreen({ discord, publicState, privateState, ins
     }
   }, [publicState?.log]);
 
+  // Detect deaths
+  useEffect(() => {
+    const players = publicState?.players || [];
+    const alive = players.filter((p: any) => p.alive);
+    const died = previousAlive.filter(
+      (prev: any) => !alive.find((a: any) => a.id === prev.id)
+    );
+    if (died.length > 0 && previousAlive.length > 0) {
+      died.forEach((p: any) => {
+        sound.play('death');
+        showToast('error', `💀 ${p.name} was eliminated`);
+      });
+    }
+    setPreviousAlive(alive);
+  }, [publicState?.players]);
+
   const players = publicState?.players || [];
   const alivePlayers = players.filter((p: any) => p.alive);
   const myPlayer = players.find((p: any) => p.id === user?.id);
@@ -74,21 +100,26 @@ export default function GameplayScreen({ discord, publicState, privateState, ins
 
   const submitNightAction = () => {
     if (!selectedTarget || !socket) return;
+    sound.play('vote');
     socket.emit('action:night', { 
       targetId: selectedTarget, 
       ability: myRole === 'werewolf' ? 'kill' : myRole === 'seer' ? 'inspect' : 'protect' 
     });
     setSelectedTarget(null);
+    showToast('success', 'Action submitted!');
   };
 
   const submitVote = () => {
     if (!selectedTarget || !socket) return;
+    sound.play('vote');
     socket.emit('action:vote', { targetId: selectedTarget });
     setSelectedTarget(null);
+    showToast('success', 'Vote cast!');
   };
 
   const sendChat = () => {
     if (!chatInput.trim() || !socket) return;
+    sound.play('click');
     socket.emit('chat:send', { text: chatInput.trim() });
     setChatInput('');
   };
@@ -104,6 +135,11 @@ export default function GameplayScreen({ discord, publicState, privateState, ins
       exit={{ opacity: 0 }}
     >
       <PhaseBackground phase={phase} />
+      
+      {/* Death effects */}
+      <AnimatePresence>
+        {showDeathEffect && phase === 'NIGHT' && <LightningBolt />}
+      </AnimatePresence>
 
       {/* Header */}
       <motion.header 
@@ -197,6 +233,13 @@ export default function GameplayScreen({ discord, publicState, privateState, ins
             log={publicState?.log || []}
             onReturn={onLeave}
           />
+        )}
+      </AnimatePresence>
+
+      {/* Slash effect on death */}
+      <AnimatePresence>
+        {phase === 'VOTE_RESULTS' && publicState?.log?.some((l: string) => l.includes('lynched')) && (
+          <SlashOverlay key="slash" />
         )}
       </AnimatePresence>
 
