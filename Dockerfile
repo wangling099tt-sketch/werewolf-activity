@@ -3,15 +3,15 @@ FROM node:18-alpine
 WORKDIR /app
 
 COPY package*.json ./
-RUN npm ci --only=production
+COPY server/package*.json ./server/
+COPY shared/ ./shared/
+
+RUN npm ci
 
 COPY . .
 
-RUN apk add --no-cache tini && tini -g
-
-EXPOSE 3000
+EXPOSE 3001
 
 USER node
 
-ENTRYPOINT ["tini", "--"]
 CMD ["node", "server.js"]
