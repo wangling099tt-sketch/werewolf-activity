@@ -10,12 +10,6 @@ RUN cd client && npm install && npm run build
 
 # Copy server files
 COPY server/ ./server/
-COPY shared/ ./shared/
-
-# Copy root level files needed
-COPY server.js ./
-# .env.example is optional - skip if not present
-COPY .env.example* .env.example 2>/dev/null || true
 
 EXPOSE 3001
 
