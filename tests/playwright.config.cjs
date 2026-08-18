@@ -8,7 +8,7 @@ module.exports = defineConfig({
   expect: { timeout: 10000 },
   fullyParallel: true,
   retries: 1,
-  workers: 2,
+  workers: 1,
   reporter: [['list']],
   use: {
     baseURL: process.env.BASE_URL || 'https://werewolf-activity-production.up.railway.app',

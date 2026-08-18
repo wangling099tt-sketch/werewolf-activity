@@ -12,9 +12,8 @@ test.describe('🐺 MA SÓI - UI Mới', () => {
 
   // Helper: wait for Tailwind + JS init
   async function waitForReady(page) {
-    await page.goto(BASE_URL, { waitUntil: 'load', timeout: 60000 });
-    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
-    await page.waitForTimeout(2000);
+    await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    await page.waitForTimeout(3000);
   }
 
   test('1. Trang chủ MA SÓI với TẠO PHÒNG / TÌM PHÒNG', async ({ page }) => {
