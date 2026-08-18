@@ -1,0 +1,22 @@
+name = "werewolvesville"
+compatibility_date = "2025-08-18"
+pages_build_output_dir = "./dist"
+
+[build]
+command = "npm run build"
+
+[env]
+VITE_SERVER_URL = "https://werewolvesville-api.lucas-phan.workers.dev"
+VITE_DISCORD_CLIENT_ID = "1414397182890606665"
+
+[[redirects]]
+from = "/api/*"
+to = "https://werewolvesville-api.lucas-phan.workers.dev/api/:splat"
+status = 200
+force = false
+
+[[redirects]]
+from = "/socket.io/*"
+to = "https://werewolvesville-api.lucas-phan.workers.dev/socket.io/:splat"
+status = 200
+force = false

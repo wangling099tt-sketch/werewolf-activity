@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "name": "Wolvesville",
+  "description": "Wolvesville-style werewolf game built with React + Cloudflare",
+  "homepage_url": "https://werewolvesville.pages.dev",
+  "logo_url": "https://werewolvesville.pages.dev/favicon.svg",
+  "tags": ["gaming", "discord", "social-deduction"],
+  "id": "io.github.wolvesville",
+  "short_name": "Wolvesville"
+}

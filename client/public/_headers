@@ -1,0 +1,12 @@
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: microphone=*, camera=*
+  Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.discord.com https://*.discordapp.com https://fonts.googleapis.com https://fonts.gstatic.com https://cdn.discordapp.com https://api.dicebear.com data: blob: ws: wss:;
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts.googleapis.com
+  Cache-Control: public, max-age=31536000
