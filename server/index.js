@@ -16,6 +16,29 @@ const app = express();
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
 
+// CSP headers - allow Discord Activity iframe + Google Fonts + Socket.io
+app.use((_req, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy',
+    [
+      "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: ws: wss:",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.discord.com https://*.discordapp.com https://*.discord.gg",
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com blob:",
+      "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "font-src 'self' data: https://fonts.googleapis.com https://fonts.gstatic.com",
+      "img-src 'self' data: blob: https://cdn.discordapp.com https://*.discord.com https://*.discordapp.com https://api.dicebear.com https://*.githubusercontent.com",
+      "connect-src 'self' ws: wss: http: https: data: blob: https://*.discord.com https://*.discordapp.com https://*.discord.gg https://gateway.discord.gg https://*.discord.media",
+      "media-src 'self' blob: https://*.discord.com https://*.discordapp.com",
+      "frame-ancestors 'self' https://*.discord.com https://discord.com https://*.discord.gg https://canary.discord.com",
+      "worker-src 'self' blob:",
+      "manifest-src 'self'",
+    ].join('; ')
+  );
+  res.setHeader('X-Frame-Options', 'ALLOW-FROM https://discord.com https://*.discord.com https://*.discord.gg');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  next();
+});
+
 app.use(express.static(CLIENT_DIST));
 
 app.get('*', (req, res, next) => {

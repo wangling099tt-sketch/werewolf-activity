@@ -39,6 +39,9 @@ export function useDiscordSdk() {
       // Discord injects __DISCORD__ or has iframe parent
       (window as any).__DISCORD__ !== undefined ||
       (window as any).DiscordSDK !== undefined ||
+      // Check URL params from Discord iframe
+      new URLSearchParams(window.location.search).has('instance_id') ||
+      new URLSearchParams(window.location.search).has('frame_id') ||
       // Check parent window origin
       (() => {
         try {
@@ -50,7 +53,7 @@ export function useDiscordSdk() {
       })()
     );
 
-    // Auto-fallback timeout - if Discord SDK doesn't initialize in 4s, use mock
+    // Auto-fallback timeout - 15s for Discord, 4s for browser
     const fallbackTimeout = setTimeout(() => {
       if (!mounted) return;
       console.log('⏱️ Discord SDK timeout, using dev mode');
@@ -69,7 +72,7 @@ export function useDiscordSdk() {
           applicationId: CLIENT_ID,
         },
       });
-    }, isInDiscord ? 10000 : 4000);
+    }, isInDiscord ? 15000 : 4000);
 
     async function initDiscord() {
       try {

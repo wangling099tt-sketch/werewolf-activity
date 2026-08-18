@@ -32,7 +32,7 @@ COPY --from=server-builder /build /app/server
 # Copy server source (for runtime)
 COPY server/ /app/server/
 
-# Fix Windows-style line endings in server files (git CRLF ’ LF)
+# Fix Windows-style line endings in server files (git CRLF ï¿½ LF)
 RUN find /app/server -name '*.js' -exec sed -i 's/\r$//' {} \; 2>/dev/null || true
 
 EXPOSE 3001
