@@ -10,7 +10,7 @@ import { ROLES } from './roles.js';
 import { BotManager } from './bots.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = process.env.GAME_PORT || 3001;
+const PORT = process.env.PORT || process.env.GAME_PORT || 3001;
 const CLIENT_DIST = path.join(__dirname, '..', 'client', 'dist');
 
 const app = express();
