@@ -21,20 +21,21 @@ app.use((_req, res, next) => {
   res.setHeader(
     'Content-Security-Policy',
     [
-      "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: ws: wss:",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.discord.com https://*.discordapp.com https://*.discord.gg",
+      "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: ws: wss: https://*.discord.com https://*.discordapp.com https://*.discord.gg https://*.discord.media",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.discord.com https://*.discordapp.com https://*.discord.gg https://discord.com https://canary.discord.com",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com blob:",
       "style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' data: https://fonts.googleapis.com https://fonts.gstatic.com",
       "img-src 'self' data: blob: https://cdn.discordapp.com https://*.discord.com https://*.discordapp.com https://api.dicebear.com https://*.githubusercontent.com",
-      "connect-src 'self' ws: wss: http: https: data: blob: https://*.discord.com https://*.discordapp.com https://*.discord.gg https://gateway.discord.gg https://*.discord.media",
+      "connect-src 'self' ws: wss: http: https: data: blob: https://*.discord.com https://*.discordapp.com https://*.discord.gg https://gateway.discord.gg https://*.discord.media https://*.discordcdn.com",
       "media-src 'self' blob: https://*.discord.com https://*.discordapp.com",
-      "frame-ancestors 'self' https://*.discord.com https://discord.com https://*.discord.gg https://canary.discord.com",
+      "frame-src 'self' https://*.discord.com https://discord.com https://*.discord.gg https://canary.discord.com https://ptb.discord.com https://discord.com/activities",
+      "frame-ancestors 'self' https://*.discord.com https://discord.com https://*.discord.gg https://canary.discord.com https://ptb.discord.com",
       "worker-src 'self' blob:",
       "manifest-src 'self'",
     ].join('; ')
   );
-  res.setHeader('X-Frame-Options', 'ALLOW-FROM https://discord.com https://*.discord.com https://*.discord.gg');
+  // X-Frame-Options is deprecated in favor of CSP frame-ancestors
   res.setHeader('Referrer-Policy', 'no-referrer');
   next();
 });
