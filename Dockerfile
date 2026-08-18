@@ -2,11 +2,14 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copy all client files first
+# Copy client files first
 COPY client/ ./client/
 
-# Install and build client
-RUN cd client && npm install && npm run build
+# Force npm install (no cache)
+RUN cd client && npm ci --prefer-offline=false || npm install --force
+
+# Build client
+RUN cd client && npm run build
 
 # Copy server files
 COPY server/ ./server/
