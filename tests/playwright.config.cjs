@@ -3,7 +3,7 @@ const { defineConfig, devices } = require('@playwright/test');
 
 module.exports = defineConfig({
   testDir: '.',
-  testMatch: /werewolf-ui\.spec\.cjs$/,
+  testMatch: /werewolvesville\.spec\.cjs$/,
   timeout: 60000,
   expect: { timeout: 10000 },
   fullyParallel: true,
