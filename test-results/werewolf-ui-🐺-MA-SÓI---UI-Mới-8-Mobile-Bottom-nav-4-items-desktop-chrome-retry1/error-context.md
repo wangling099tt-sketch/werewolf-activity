@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: werewolf-ui.spec.cjs >> 🐺 MA SÓI - UI Mới >> 6. Theme toggle Light ↔ Dark
-- Location: werewolf-ui.spec.cjs:84:3
+- Name: werewolf-ui.spec.cjs >> 🐺 MA SÓI - UI Mới >> 8. Mobile: Bottom nav 4 items
+- Location: werewolf-ui.spec.cjs:102:3
 
 # Error details
 
