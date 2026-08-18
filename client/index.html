@@ -1,819 +1,548 @@
 <!DOCTYPE html>
-<html lang="vi" data-theme="day">
+<html class="light" lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Werewolf Game - Discord Activity</title>
-  
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Fredoka+One&display=swap" rel="stylesheet">
-  
-  <!-- CSS Styles -->
-  <link rel="stylesheet" href="src/styles/theme.css">
-  <link rel="stylesheet" href="src/styles.css">
-  
-  <style>
-    /* Demo Navigation */
-    .demo-nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(10px);
-      padding: 0.75rem 1rem;
-      display: flex;
-      gap: 0.5rem;
-      overflow-x: auto;
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sảnh Chờ - MA SÓI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600&family=JetBrains+Mono:wght@600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            "colors": {
+                "on-error": "#ffffff",
+                "on-secondary": "#ffffff",
+                "outline": "#6e7880",
+                "on-primary-fixed-variant": "#004c6a",
+                "on-surface": "#1c1c19",
+                "error-container": "#ffdad6",
+                "surface-dim": "#dcdad5",
+                "on-tertiary-fixed-variant": "#6b00af",
+                "secondary-fixed": "#ffdcbc",
+                "primary-container": "#2bb2ee",
+                "on-secondary-fixed-variant": "#683d00",
+                "inverse-on-surface": "#f3f0eb",
+                "inverse-primary": "#7fd0ff",
+                "primary-fixed-dim": "#7fd0ff",
+                "surface-bright": "#fcf9f4",
+                "on-tertiary": "#ffffff",
+                "outline-variant": "#bdc8d1",
+                "surface-container": "#f0ede8",
+                "surface-variant": "#e5e2dd",
+                "background": "#fcf9f4",
+                "primary": "#00658c",
+                "on-background": "#1c1c19",
+                "tertiary": "#862dcb",
+                "surface-container-highest": "#e5e2dd",
+                "surface": "#fcf9f4",
+                "tertiary-container": "#cb8bff",
+                "on-tertiary-container": "#5c0097",
+                "on-primary": "#ffffff",
+                "on-error-container": "#93000a",
+                "on-tertiary-fixed": "#2e004e",
+                "tertiary-fixed-dim": "#e0b6ff",
+                "surface-container-low": "#f6f3ee",
+                "on-primary-fixed": "#001e2d",
+                "error": "#ba1a1a",
+                "on-secondary-fixed": "#2c1700",
+                "secondary-fixed-dim": "#ffb86b",
+                "surface-container-high": "#ebe8e3",
+                "inverse-surface": "#31302d",
+                "secondary": "#895100",
+                "on-secondary-container": "#663b00",
+                "on-surface-variant": "#3e484f",
+                "primary-fixed": "#c5e7ff",
+                "surface-container-lowest": "#ffffff",
+                "tertiary-fixed": "#f2daff",
+                "on-primary-container": "#00415b",
+                "secondary-container": "#fd9d1a",
+                "surface-tint": "#00658c"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "spacing": {
+                "max-width": "1440px",
+                "margin-mobile": "16px",
+                "gutter": "24px",
+                "unit": "8px",
+                "margin-desktop": "48px"
+            },
+            "fontFamily": {
+                "headline-display": ["Plus Jakarta Sans"],
+                "body-md": ["Hanken Grotesk"],
+                "headline-lg": ["Plus Jakarta Sans"],
+                "headline-lg-mobile": ["Plus Jakarta Sans"],
+                "label-caps": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                "headline-display": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "fontWeight": "700" }],
+                "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "600" }]
+            }
+        }
     }
-    
-    .demo-nav-btn {
-      padding: 0.5rem 1rem;
-      font-size: 0.85rem;
-      white-space: nowrap;
-    }
-    
-    .screen {
-      display: none;
-      padding-top: 60px;
-    }
-    
-    .screen.active {
-      display: flex;
-      flex-direction: column;
-    }
-    
-    /* ===== Demo Badge - REAL Image from postimg.cc ===== */
-    .demo-badge {
-      position: fixed;
-      bottom: 1rem;
-      left: 1rem;
-      z-index: 999;
-      background: rgba(0,0,0,0.7);
-      color: white;
-      padding: 0.5rem 0.75rem;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      backdrop-filter: blur(10px);
-    }
-    
-    /* Reference Image Thumbnails */
-    .ref-img {
-      position: fixed;
-      bottom: 1rem;
-      right: 1rem;
-      z-index: 999;
-      width: 60px;
-      height: 60px;
-      border-radius: 12px;
-      border: 2px solid var(--accent);
-      overflow: hidden;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .ref-img:hover {
-      transform: scale(1.1) rotate(2deg);
-      box-shadow: 0 12px 28px var(--accent);
-    }
-    
-    .ref-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    /* ===== Image 1: Loading screen with REAL reference loading icon ===== */
-    .loading-real-image {
-      position: absolute;
-      top: 18%;
-      right: 8%;
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      border: 4px solid var(--accent);
-      overflow: hidden;
-      box-shadow: 0 0 40px rgba(155, 89, 182, 0.6);
-      animation: logoFloat 3s ease-in-out infinite;
-      animation-delay: 0.5s;
-    }
-    
-    .loading-real-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    /* ===== Image 2: Lobby background card with REAL lobby image ===== */
-    .lobby-real-image {
-      position: absolute;
-      top: 5%;
-      right: 5%;
-      width: 200px;
-      height: 140px;
-      border-radius: 16px;
-      overflow: hidden;
-      border: 3px solid var(--accent);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.4);
-      transform: rotate(3deg);
-      transition: transform 0.4s ease;
-    }
-    
-    [data-theme="day"] .lobby-real-image {
-      box-shadow: 0 12px 32px rgba(155, 89, 182, 0.3);
-    }
-    
-    .lobby:hover .lobby-real-image {
-      transform: rotate(0deg) scale(1.05);
-    }
-    
-    .lobby-real-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    /* ===== Image 3 & 4: Waiting room with REAL day/night scenes ===== */
-    .waiting-scene-bg {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      overflow: hidden;
-      border-radius: var(--border-radius-lg);
-      opacity: 0.4;
-      transition: opacity 0.6s ease;
-    }
-    
-    [data-theme="night"] .waiting-scene-bg {
-      opacity: 0.6;
-    }
-    
-    .waiting-scene-bg img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.6s ease;
-    }
-    
-    .waiting-room:hover .waiting-scene-bg img {
-      transform: scale(1.05);
-    }
-    
-    .waiting-position-relative {
-      position: relative;
-      z-index: 1;
-    }
-    
-    /* ===== Image 5: Chat box style with REAL chat reference ===== */
-    .chat-preview-mini {
-      position: absolute;
-      top: -50px;
-      right: 0;
-      width: 80px;
-      height: 80px;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 2px solid var(--accent);
-      opacity: 0.7;
-      transition: all 0.3s ease;
-    }
-    
-    .chat-container:hover .chat-preview-mini {
-      opacity: 1;
-      transform: scale(1.1) rotate(-3deg);
-    }
-    
-    .chat-preview-mini img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    /* Reference Gallery Modal */
-    .ref-gallery {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.9);
-      z-index: 10000;
-      padding: 2rem;
-      overflow-y: auto;
-      backdrop-filter: blur(10px);
-    }
-    
-    .ref-gallery.active {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-    }
-    
-    .ref-gallery-close {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 24px;
-      font-weight: 700;
-      cursor: pointer;
-      z-index: 10001;
-    }
-    
-    .ref-gallery h2 {
-      color: var(--accent);
-      font-family: var(--font-display);
-      margin: 1rem 0;
-    }
-    
-    .ref-gallery img {
-      max-width: 90vw;
-      max-height: 60vh;
-      border-radius: 16px;
-      border: 3px solid var(--accent);
-      box-shadow: 0 0 40px rgba(155, 89, 182, 0.5);
-    }
-    
-    .ref-gallery p {
-      color: white;
-      max-width: 600px;
-      text-align: center;
-      font-size: 0.95rem;
-    }
-  </style>
+}
+</script>
+<style>
+.mechanical-btn {
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s ease;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+}
+.mechanical-btn:hover {
+    transform: scale(1.02) translateY(-2px);
+    box-shadow: 0 6px 0 rgba(0,0,0,0.2);
+}
+.mechanical-btn:active {
+    transform: scale(0.98) translateY(4px);
+    box-shadow: 0 0 0 rgba(0,0,0,0.2);
+}
+.chat-scroll::-webkit-scrollbar { width: 6px; }
+.chat-scroll::-webkit-scrollbar-track { background: transparent; }
+.chat-scroll::-webkit-scrollbar-thumb { background-color: #bdc8d1; border-radius: 20px; }
+.glass-panel {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.dark .glass-panel {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+
+/* Background shader */
+.bg-shader {
+    position: fixed; inset: 0; z-index: -1;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(43, 178, 238, 0.15), transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(134, 45, 203, 0.15), transparent 50%);
+    pointer-events: none;
+}
+.dark .bg-shader {
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(43, 178, 238, 0.08), transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(134, 45, 203, 0.1), transparent 50%);
+}
+
+/* Wooden block for waiting room */
+.wooden-block {
+    width: 80px; height: 60px;
+    background: linear-gradient(180deg, #c08552 0%, #8b5a2b 100%);
+    border-radius: 8px 8px 12px 12px;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 6px 16px rgba(0,0,0,0.4), inset 0 3px 0 rgba(255,255,255,0.2);
+    position: relative;
+}
+.wooden-block::before {
+    content: ''; position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+    width: 60px; height: 16px;
+    background: radial-gradient(ellipse, rgba(139, 90, 43, 0.4), transparent 70%);
+    border-radius: 50%;
+}
+
+/* Stickman */
+.stickman-svg { width: 50px; height: 70px; }
+</style>
 </head>
-<body>
-  <!-- ===== DEMO NAVIGATION ===== -->
-  <nav class="demo-nav">
-    <button class="btn btn-sm btn-outline demo-nav-btn" onclick="showScreen('loading')">1. Loading SDK</button>
-    <button class="btn btn-sm btn-outline demo-nav-btn" onclick="showScreen('lobby')">2. Lobby</button>
-    <button class="btn btn-sm btn-outline demo-nav-btn" onclick="showScreen('waiting')">3. Waiting Room</button>
-    <button class="btn btn-sm btn-outline demo-nav-btn" onclick="showScreen('game')">4. In-Game</button>
-    <button class="btn btn-sm btn-outline demo-nav-btn" onclick="showScreen('mobile')">5. Mobile</button>
-  </nav>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md overflow-x-hidden relative">
+<div class="bg-shader"></div>
 
-  <!-- ===== THEME TOGGLE ===== -->
-  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Day/Night">
-    <svg class="sun-icon" viewBox="0 0 24 24" style="display: none;">
-      <path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.03-.39-1.41 0-.39.39-.39 1.03 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0 .39-.39.39-1.03 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.03 0-1.41-.39-.39-1.03-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.03 0 1.41s1.03.39 1.41 0l1.06-1.06z"/>
-    </svg>
-    <svg class="moon-icon" viewBox="0 0 24 24">
-      <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
-    </svg>
-  </button>
+<!-- Top App Bar -->
+<header class="bg-background/80 backdrop-blur-md text-primary font-headline-lg docked w-full top-0 sticky flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 z-50 bg-surface-container-low border-b border-surface-container-highest">
+<div class="flex items-center gap-unit-2 font-headline-lg font-extrabold text-primary tracking-tighter">
+<span>MA SÓI</span>
+</div>
+<div class="flex items-center gap-unit-3">
+<button aria-label="Toggle Theme" class="text-on-surface-variant hover:scale-105 transition-transform duration-200 active:scale-95 w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-variant" onclick="toggleTheme()">
+<span class="material-symbols-outlined theme-icon" style="font-variation-settings: 'FILL' 1;">light_mode</span>
+</button>
+<button aria-label="Settings" class="text-on-surface-variant hover:scale-105 transition-transform duration-200 active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+</button>
+<button aria-label="Help" class="text-on-surface-variant hover:scale-105 transition-transform duration-200 active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
+</button>
+<button aria-label="Account" class="text-on-surface-variant hover:scale-105 transition-transform duration-200 active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">account_circle</span>
+</button>
+</div>
+</header>
 
-  <!-- ===== SCREEN 1: LOADING SDK ===== -->
-  <div id="screen-loading" class="screen active">
-    <div class="loading-screen" id="loadingScreen">
-      <div class="loading-glow"></div>
-      <div class="loading-glow"></div>
-      
-      <!-- Image 1: REAL loading reference from postimg.cc -->
-      <div class="loading-real-image">
-        <img src="https://i.postimg.cc/XvZyYKZf/load.jpg" alt="Loading Reference" onerror="this.style.display='none'">
-      </div>
-      
-      <div class="loading-logo">
-        <svg viewBox="0 0 100 100">
-          <defs>
-            <linearGradient id="wolfGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color:#9b59b6"/>
-              <stop offset="100%" style="stop-color:#8e44ad"/>
-            </linearGradient>
-            <filter id="glow">
-              <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
-              <feMerge>
-                <feMergeNode in="coloredBlur"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
-          </defs>
-          <circle cx="50" cy="50" r="45" fill="url(#wolfGrad)" filter="url(#glow)"/>
-          <text x="50" y="62" font-size="40" text-anchor="middle" fill="white">🐺</text>
-        </svg>
-      </div>
-      
-      <h1 class="loading-title">Werewolf</h1>
-      <p class="loading-subtitle">Loading SDK...</p>
-      
-      <div class="loading-progress-container">
-        <div class="loading-circle-bg"></div>
-        <div class="loading-circle-progress"></div>
-        <span class="loading-percentage" id="loadingPercent">0</span>
-      </div>
-      
-      <div class="loading-status">
-        <span id="loadingText">Initializing...</span>
-        <div class="loading-dots">
-          <span class="loading-dot"></span>
-          <span class="loading-dot"></span>
-          <span class="loading-dot"></span>
-        </div>
-      </div>
-      
-      <p class="loading-tip">Join a voice channel to start playing!</p>
-    </div>
-  </div>
+<div class="flex flex-col md:flex-row flex-1 w-full max-w-max-width mx-auto pb-[80px] md:pb-0">
+<!-- Side Nav Bar (Desktop) -->
+<nav class="hidden md:flex flex-col w-[320px] h-[calc(100vh-80px)] sticky top-[80px] left-0 bg-surface-container-low text-primary font-body-md border-r border-surface-container-highest p-unit-3 gap-unit-2 z-40">
+<div class="flex items-center gap-unit-3 p-unit-2 mb-unit-4 border-b border-outline-variant/20 pb-unit-4">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-lg" id="userAvatar">NC</div>
+<div>
+<h3 class="font-bold text-on-surface" id="userName">Người Chơi</h3>
+<p class="font-label-caps text-on-surface-variant text-xs">Cấp độ 15</p>
+</div>
+</div>
+<a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-primary font-bold border-r-4 border-primary bg-primary-container/10" href="#" onclick="showScreen('lobby')">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>Trang chủ
+</a>
+<a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors active:scale-[0.98]" href="#" onclick="showScreen('lobby')">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">swords</span>Phòng chơi
+</a>
+<a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">group</span>Bạn bè
+</a>
+<a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_bag</span>Cửa hàng
+</a>
+<div class="mt-auto flex flex-col gap-unit-2 border-t border-outline-variant/20 pt-unit-4">
+<button class="w-full py-2 bg-tertiary text-on-tertiary rounded-lg font-bold hover:bg-tertiary-container hover:text-on-tertiary-container transition-colors mechanical-btn">
+Nâng cấp Premium
+</button>
+<a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>Cài đặt
+</a>
+<a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-error hover:bg-error-container transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">logout</span>Đăng xuất
+</a>
+</div>
+</nav>
 
-  <!-- ===== SCREEN 2: LOBBY ===== -->
-  <div id="screen-lobby" class="screen">
-    <div class="lobby">
-      <!-- Image 2: REAL lobby reference from postimg.cc -->
-      <div class="lobby-real-image">
-        <img src="https://i.postimg.cc/d3gS3n36/loppy.jpg" alt="Lobby Reference" onerror="this.parentElement.style.display='none'">
-      </div>
-      
-      <div class="lobby-header">
-        <h1 class="lobby-title">🐺 Werewolf</h1>
-        <p class="lobby-subtitle">Social Deduction Game</p>
-      </div>
-      
-      <div class="lobby-actions">
-        <button class="btn btn-primary btn-lg btn-pulse" onclick="showScreen('waiting')">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-          </svg>
-          Tạo Phòng
-        </button>
-        <button class="btn btn-secondary btn-lg" onclick="showScreen('waiting')">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-          </svg>
-          Tìm Phòng
-        </button>
-      </div>
-    </div>
-  </div>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col lg:flex-row gap-gutter p-margin-mobile md:p-margin-desktop min-h-full">
 
-  <!-- ===== SCREEN 3: WAITING ROOM ===== -->
-  <div id="screen-waiting" class="screen">
-    <div class="waiting-room">
-      <!-- Image 3 & 4: REAL day/night scene from postimg.cc -->
-      <div class="waiting-scene-bg">
-        <img class="waiting-img-day" src="https://i.postimg.cc/D0N9nKRY/trong-tran-1.jpg" alt="Day Scene" onerror="this.style.display='none'">
-        <img class="waiting-img-night" src="https://i.postimg.cc/mgj0gCxp/trong-tran-2.jpg" alt="Night Scene" style="display:none" onerror="this.style.display='none'">
-      </div>
-      
-      <div class="waiting-position-relative">
-        <div class="room-header">
-          <div class="room-info">
-            <h2 class="room-name">🏠 Phòng Của Lucas</h2>
-            <span class="room-code">📋 WER-2847</span>
-          </div>
-          <span class="room-players-count" id="playerCount">5/10 người chơi</span>
-        </div>
-      
-      <div class="player-slots" id="playerSlots"></div>
-      
-      <div class="room-actions">
-        <button class="btn btn-ghost" onclick="toggleTheme()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-2.98 0-5.4-2.42-5.4-5.4 0-1.81.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/>
-          </svg>
-          Đổi Theme
-        </button>
-        <button class="btn btn-ghost" onclick="showScreen('lobby')">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z"/>
-          </svg>
-          Quay Lại
-        </button>
-        <button class="btn btn-primary btn-lg btn-pulse btn-glow" onclick="showScreen('game')">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M8 5v14l11-7z"/>
-          </svg>
-          Bắt Đầu Chơi
-        </button>
-      </div>
-      </div><!-- /waiting-position-relative -->
-    </div>
-  </div>
+<!-- =============== SCREEN: LOBBY =============== -->
+<section id="screen-lobby" class="flex-1 flex flex-col gap-gutter lg:w-[70%]">
+<section class="glass-panel rounded-xl p-8 flex flex-col items-center justify-center text-center relative overflow-hidden min-h-[260px] border border-outline-variant/20">
+<div class="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none"></div>
+<h1 class="font-headline-display text-headline-display text-primary drop-shadow-md relative z-10 font-extrabold mb-2 uppercase tracking-widest">MA SÓI</h1>
+<p class="font-body-md text-on-surface-variant text-lg font-medium tracking-wide z-10">Social Deduction Game</p>
+<div class="flex flex-col sm:flex-row gap-4 mt-8 z-10 w-full sm:w-auto">
+<button class="mechanical-btn bg-gradient-to-r from-tertiary to-[#a259ff] text-on-tertiary px-8 py-3 rounded-lg font-label-caps text-label-caps flex items-center justify-center gap-2 flex-1 sm:flex-none border border-tertiary/50" onclick="showScreen('room')">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">add_circle</span>TẠO PHÒNG
+</button>
+<button class="mechanical-btn bg-primary text-on-primary px-8 py-3 rounded-lg font-label-caps text-label-caps flex items-center justify-center gap-2 flex-1 sm:flex-none border border-primary/50" onclick="showScreen('room')">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 0;">search</span>TÌM PHÒNG
+</button>
+</div>
+</section>
 
-  <!-- ===== SCREEN 4: GAME + CHAT ===== -->
-  <div id="screen-game" class="screen">
-    <div class="game-layout">
-      <div class="game-area">
-        <div class="lobby-header">
-          <div class="room-info">
-            <h2 style="margin: 0; font-size: 18px;">☀️ Ban Ngày - Thảo Luận</h2>
-          </div>
-        </div>
-        
-        <div class="lobby-scene">
-          <div class="player-circles" style="min-height: 300px;">
-            <div class="player-circle is-you" style="left: 50%; top: 25%; transform: translate(-50%, -50%);">
-              <div class="avatar-ring" style="width: 70px; height: 70px;">
-                <div style="width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #9b59b6, #8e44ad); display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">L</div>
-              </div>
-              <span class="name-pill">Lucas <span style="background: var(--accent); color: white; font-size: 10px; padding: 1px 4px; border-radius: 4px;">★</span></span>
-            </div>
-            <div class="player-circle" style="left: 25%; top: 50%;">
-              <div class="avatar-ring" style="width: 60px; height: 60px;">
-                <div style="width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #3498db, #2980b9); display: flex; align-items: center; justify-content: center; font-size: 20px; color: white;">M</div>
-              </div>
-              <span class="name-pill">Minh</span>
-            </div>
-            <div class="player-circle" style="left: 75%; top: 50%;">
-              <div class="avatar-ring" style="width: 60px; height: 60px;">
-                <div style="width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #27ae60, #1e8449); display: flex; align-items: center; justify-content: center; font-size: 20px; color: white;">A</div>
-              </div>
-              <span class="name-pill">An</span>
-            </div>
-            <div class="player-circle is-host" style="left: 35%; top: 75%;">
-              <div class="avatar-ring" style="width: 60px; height: 60px; background: linear-gradient(135deg, #fbbf24, #f59e0b);">
-                <div style="width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #e74c3c, #c0392b); display: flex; align-items: center; justify-content: center; font-size: 20px; color: white;">B</div>
-              </div>
-              <span class="name-pill">Bảo</span>
-            </div>
-            <div class="player-circle" style="left: 65%; top: 75%;">
-              <div class="avatar-ring" style="width: 60px; height: 60px;">
-                <div style="width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, #f39c12, #d97706); display: flex; align-items: center; justify-content: center; font-size: 20px; color: white;">C</div>
-              </div>
-              <span class="name-pill">Chi</span>
-            </div>
-          </div>
-          
-          <div style="display: flex; justify-content: center; padding: 10px 20px;">
-            <div class="center-card">
-              <div class="phase-h1">Bàn Luận</div>
-              <div class="phase-sub">💬 Thảo luận ai là sói</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Chat Box - Desktop: Side -->
-      <div class="chat-container">
-        <!-- Image 5: REAL chat reference thumbnail -->
-        <div class="chat-preview-mini">
-          <img src="https://i.postimg.cc/768MvtBd/Gameeeeeeee.jpg" alt="Chat Reference" onerror="this.parentElement.style.display='none'">
-        </div>
-        
-        <div class="chat-header">
-          <span class="chat-title">
-            <svg viewBox="0 0 24 24">
-              <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
-            </svg>
-            Chat
-          </span>
-        </div>
-        
-        <div class="chat-messages" id="chatMessages">
-          <div class="chat-message system">
-            <div class="chat-message-text">🎮 Game started! Werewolf, beware...</div>
-          </div>
-          <div class="chat-message">
-            <div class="chat-message-avatar" style="background: #9b59b6;">L</div>
-            <div class="chat-message-content">
-              <div class="chat-message-header">
-                <span class="chat-message-author">Lucas</span>
-                <span class="chat-message-time">10:30</span>
-              </div>
-              <div class="chat-message-text">Chào mọi người! Ai là sói đây? 🐺</div>
-            </div>
-          </div>
-          <div class="chat-message">
-            <div class="chat-message-avatar" style="background: #3498db;">M</div>
-            <div class="chat-message-content">
-              <div class="chat-message-header">
-                <span class="chat-message-author">Minh</span>
-                <span class="chat-message-time">10:31</span>
-              </div>
-              <div class="chat-message-text">Chắc không phải mình đâu 😄</div>
-            </div>
-          </div>
-          <div class="chat-message">
-            <div class="chat-message-avatar" style="background: #27ae60;">A</div>
-            <div class="chat-message-content">
-              <div class="chat-message-header">
-                <span class="chat-message-author">An</span>
-                <span class="chat-message-time">10:32</span>
-              </div>
-              <div class="chat-message-text">Mình thề không phải sói! Bình chọn đi!</div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="chat-input-area">
-          <div class="chat-input-wrapper">
-            <input type="text" class="chat-input" id="chatInput" placeholder="Nhắn tin..." onkeypress="handleChatKeypress(event)">
-            <button class="chat-send-btn" onclick="sendMessage()">
-              <svg viewBox="0 0 24 24">
-                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<section class="flex flex-col gap-unit-3">
+<div class="flex justify-between items-center mb-2">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Phòng Đang Chờ</h2>
+<button class="text-primary hover:text-primary-container font-label-caps text-sm flex items-center gap-1 transition-colors" onclick="refreshRooms()">
+<span class="material-symbols-outlined text-sm">refresh</span>Làm mới
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-unit-3" id="roomGrid">
+<!-- Room cards rendered by JS -->
+</div>
+</section>
 
-  <!-- ===== SCREEN 5: MOBILE VIEW ===== -->
-  <div id="screen-mobile" class="screen" style="max-width: 480px; margin: 0 auto;">
-    <div style="padding: 60px 1rem 1rem;">
-      <h2 style="font-family: var(--font-display); color: var(--accent); margin-bottom: 1rem;">📱 Mobile Portrait</h2>
-      <p style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.9rem;">Chat box di chuyển xuống dưới trên mobile</p>
-      
-      <div class="game-layout" style="flex-direction: column; min-height: auto; padding: 1rem;">
-        <div class="game-area">
-          <div class="lobby-header" style="margin-bottom: 1rem;">
-            <div class="room-info">
-              <h2 style="margin: 0; font-size: 16px;">☀️ Ban Ngày</h2>
-            </div>
-          </div>
-          
-          <div class="player-slots" id="mobilePlayerSlots" style="grid-template-columns: repeat(3, 1fr); gap: 1rem; padding: 1rem; min-height: auto;"></div>
-        </div>
-        
-        <!-- Chat Box - Mobile: Bottom -->
-        <div class="chat-container" style="width: 100%; height: 220px;">
-          <div class="chat-header">
-            <span class="chat-title">💬 Chat</span>
-          </div>
-          <div class="chat-messages" style="max-height: 120px;">
-            <div class="chat-message">
-              <div class="chat-message-avatar" style="background: #9b59b6;">L</div>
-              <div class="chat-message-content">
-                <div class="chat-message-header">
-                  <span class="chat-message-author">Lucas</span>
-                </div>
-                <div class="chat-message-text">Chat ở dưới!</div>
-              </div>
-            </div>
-          </div>
-          <div class="chat-input-area">
-            <div class="chat-input-wrapper">
-              <input type="text" class="chat-input" placeholder="Nhắn tin...">
-              <button class="chat-send-btn">
-                <svg viewBox="0 0 24 24">
-                  <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<section class="flex flex-col gap-unit-3 mt-8">
+<div class="flex justify-between items-center mb-2">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Cửa Hàng Vật Phẩm</h2>
+<a class="text-primary hover:text-primary-container font-label-caps text-sm flex items-center gap-1 transition-colors" href="#">
+Xem tất cả <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="glass-panel rounded-xl overflow-hidden border border-outline-variant/30 hover:border-primary/50 transition-all group flex flex-col">
+<div class="relative h-40 overflow-hidden">
+<img alt="Nền Đêm Huyền Bí" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://i.postimg.cc/mgj0gCxp/trong-tran-2.jpg"/>
+<div class="absolute top-2 right-2 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-bold text-xs shadow-sm">500 Vàng</div>
+</div>
+<div class="p-4 flex flex-col gap-3">
+<h3 class="font-bold text-on-surface">Nền Đêm Huyền Bí</h3>
+<button class="mechanical-btn w-full py-2 bg-primary text-on-primary rounded-lg font-bold text-sm flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">shopping_cart</span>Mua
+</button>
+</div>
+</div>
+<div class="glass-panel rounded-xl overflow-hidden border border-outline-variant/30 hover:border-primary/50 transition-all group flex flex-col">
+<div class="relative h-40 overflow-hidden">
+<img alt="Nền Sáng Bình Minh" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://i.postimg.cc/D0N9nKRY/trong-tran-1.jpg"/>
+<div class="absolute top-2 right-2 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-bold text-xs shadow-sm">500 Vàng</div>
+</div>
+<div class="p-4 flex flex-col gap-3">
+<h3 class="font-bold text-on-surface">Nền Sáng Bình Minh</h3>
+<button class="mechanical-btn w-full py-2 bg-primary text-on-primary rounded-lg font-bold text-sm flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">shopping_cart</span>Mua
+</button>
+</div>
+</div>
+</div>
+</section>
+</section>
 
-  <div class="demo-badge" onclick="openRefGallery()">
-    <span>🎨</span>
-    <span>Werewolf Activity</span>
-  </div>
-  
-  <!-- Reference Image Thumbnail (click to open gallery) -->
-  <div class="ref-img" onclick="openRefGallery()" title="View Reference Images">
-    <img id="refThumbImg" src="https://i.postimg.cc/d3gS3n36/loppy.jpg" alt="Reference" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><text y=%2220%22 font-size=%2220%22>🎨</text></svg>'">
-  </div>
-  
-  <!-- ===== REFERENCE GALLERY MODAL ===== -->
-  <div class="ref-gallery" id="refGallery">
-    <button class="ref-gallery-close" onclick="closeRefGallery()">✕ Đóng</button>
-    <h2>🎨 5 Reference Images</h2>
-    
-    <div class="ref-gallery-item">
-      <h3 style="color: white;">1️⃣ SDK Loading Screen</h3>
-      <img src="https://i.postimg.cc/XvZyYKZf/load.jpg" alt="Loading" onerror="this.alt='Cannot load image'">
-      <p>Modern loading indicator với progress bar + pulse animation cho "Loading SDK..." state</p>
-    </div>
-    
-    <div class="ref-gallery-item">
-      <h3 style="color: white;">2️⃣ Lobby / Main Waiting</h3>
-      <img src="https://i.postimg.cc/d3gS3n36/loppy.jpg" alt="Lobby" onerror="this.alt='Cannot load image'">
-      <p>High-end responsive lobby với prominent "Tạo Phòng" / "Tìm Phòng" buttons</p>
-    </div>
-    
-    <div class="ref-gallery-item">
-      <h3 style="color: white;">3️⃣ In-Game Room - Day Phase</h3>
-      <img src="https://i.postimg.cc/D0N9nKRY/trong-tran-1.jpg" alt="Day" onerror="this.alt='Cannot load image'">
-      <p>Dynamic wooden blocks → stickman spawn on top với Discord username floating above</p>
-    </div>
-    
-    <div class="ref-gallery-item">
-      <h3 style="color: white;">4️⃣ In-Game Room - Night Phase</h3>
-      <img src="https://i.postimg.cc/mgj0gCxp/trong-tran-2.jpg" alt="Night" onerror="this.alt='Cannot load image'">
-      <p>Same layout dark theme với seamless Day/Night transition qua CSS variables</p>
-    </div>
-    
-    <div class="ref-gallery-item">
-      <h3 style="color: white;">5️⃣ Chat Box Concept</h3>
-      <img src="https://i.postimg.cc/768MvtBd/Gameeeeeeee.jpg" alt="Chat" onerror="this.alt='Cannot load image'">
-      <p>Native embedded chat - PC: sidebar | Mobile: bottom. No separate bot chat anymore</p>
-    </div>
-  </div>
+<!-- =============== SCREEN: ROOM (Waiting + Day/Night + Sticks) =============== -->
+<section id="screen-room" class="flex-1 flex-col gap-gutter lg:w-[70%] hidden">
+<div class="glass-panel rounded-xl p-6 border border-outline-variant/20 flex flex-col gap-4">
+<div class="flex flex-wrap items-center justify-between gap-3">
+<div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">🏠 Phòng Của Lucas</h2>
+<p class="font-mono text-on-surface-variant text-sm mt-1">#WER-2847</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="mechanical-btn px-4 py-2 bg-primary text-on-primary rounded-lg font-bold text-sm flex items-center gap-2" onclick="toggleDayNight()">
+<span class="material-symbols-outlined text-sm" id="phaseIcon">wb_sunny</span>
+<span id="phaseLabel">Ban Ngày</span>
+</button>
+<button class="mechanical-btn px-4 py-2 bg-tertiary text-on-tertiary rounded-lg font-bold text-sm flex items-center gap-2" onclick="simulateJoin()">
+<span class="material-symbols-outlined text-sm">person_add</span>Thêm người chơi
+</button>
+</div>
+</div>
 
-  <script>
-    // ===== THEME TOGGLE =====
-    function toggleTheme() {
-      const html = document.documentElement;
-      const currentTheme = html.getAttribute('data-theme');
-      const newTheme = currentTheme === 'day' ? 'night' : 'day';
-      html.setAttribute('data-theme', newTheme);
-      
-      const sunIcon = document.querySelector('.sun-icon');
-      const moonIcon = document.querySelector('.moon-icon');
-      if (newTheme === 'night') {
-        sunIcon.style.display = 'block';
-        moonIcon.style.display = 'none';
-      } else {
-        sunIcon.style.display = 'none';
-        moonIcon.style.display = 'block';
-      }
-      
-      // Swap waiting room image (Day vs Night)
-      const dayImg = document.querySelector('.waiting-img-day');
-      const nightImg = document.querySelector('.waiting-img-night');
-      if (dayImg && nightImg) {
-        if (newTheme === 'night') {
-          dayImg.style.display = 'none';
-          nightImg.style.display = 'block';
+<!-- Wooden blocks with stickmen -->
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 p-4 bg-surface-container-low rounded-lg" id="playerSlots">
+</div>
+
+<div class="flex justify-between items-center pt-2">
+<button class="mechanical-btn px-4 py-2 bg-surface-variant text-on-surface rounded-lg font-bold text-sm flex items-center gap-2" onclick="showScreen('lobby')">
+<span class="material-symbols-outlined text-sm">arrow_back</span>Quay lại
+</button>
+<button class="mechanical-btn bg-gradient-to-r from-tertiary to-[#a259ff] text-on-tertiary px-6 py-3 rounded-lg font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">play_arrow</span>Bắt đầu chơi
+</button>
+</div>
+</div>
+</section>
+
+<!-- Right Column: Chat Box (sticky sidebar) -->
+<aside class="lg:w-[30%] flex flex-col h-[500px] lg:h-auto lg:min-h-[600px] glass-panel rounded-xl border border-outline-variant/20 overflow-hidden shadow-sm">
+<div class="bg-surface-container-high p-4 border-b border-outline-variant/20 flex items-center justify-between">
+<h3 class="font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">chat</span>Kênh Thế Giới
+</h3>
+<div class="flex items-center gap-1 text-xs text-on-surface-variant">
+<div class="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>1.2k Online
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 chat-scroll bg-surface/50" id="chatLog"></div>
+<div class="p-3 bg-surface-container-low border-t border-outline-variant/20">
+<form class="flex items-center gap-2 relative" onsubmit="event.preventDefault(); addMessage();">
+<input class="flex-1 bg-surface border border-outline-variant rounded-full py-2 pl-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-body-md text-on-surface" id="chatInput" placeholder="Nhập tin nhắn..." type="text"/>
+<button class="absolute right-1 w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center hover:bg-primary/90 transition-colors active:scale-95" type="submit">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</form>
+</div>
+</aside>
+</main>
+</div>
+
+<!-- Bottom Nav (Mobile) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 rounded-t-xl border-t border-outline-variant/20 bg-background/90 backdrop-blur-xl text-primary font-label-caps flex justify-around items-center px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 active:scale-90 transition-all" href="#" onclick="showScreen('lobby')">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-[10px]">Chính</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded-xl px-4 py-1 active:scale-90 transition-all" href="#" onclick="showScreen('room')">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">sports_esports</span>
+<span class="text-[10px]">Phòng</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded-xl px-4 py-1 active:scale-90 transition-all" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">leaderboard</span>
+<span class="text-[10px]">Xếp hạng</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded-xl px-4 py-1 active:scale-90 transition-all" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="text-[10px]">Cá nhân</span>
+</a>
+</nav>
+
+<script>
+// ===== Theme =====
+function toggleTheme() {
+    const html = document.documentElement;
+    const icon = document.querySelector('.theme-icon');
+    if (html.classList.contains('dark')) {
+        html.classList.remove('dark'); html.classList.add('light');
+        icon.textContent = 'light_mode';
+    } else {
+        html.classList.remove('light'); html.classList.add('dark');
+        icon.textContent = 'dark_mode';
+    }
+}
+
+// ===== Screen navigation =====
+function showScreen(id) {
+    const lobby = document.getElementById('screen-lobby');
+    const room = document.getElementById('screen-room');
+    if (id === 'lobby') {
+        lobby.classList.remove('hidden'); lobby.style.display = '';
+        room.classList.add('hidden'); room.style.display = 'none';
+    } else if (id === 'room') {
+        lobby.classList.add('hidden'); lobby.style.display = 'none';
+        room.classList.remove('hidden'); room.style.display = 'flex';
+        renderSlots();
+    }
+}
+
+// ===== Day / Night =====
+let isNight = false;
+function toggleDayNight() {
+    isNight = !isNight;
+    document.getElementById('phaseIcon').textContent = isNight ? 'bedtime' : 'wb_sunny';
+    document.getElementById('phaseLabel').textContent = isNight ? 'Ban Đêm' : 'Ban Ngày';
+}
+
+// ===== Players =====
+const players = [
+    { name: 'Lucas', color: '#9b59b6', initial: 'L' },
+    { name: 'Minh', color: '#3498db', initial: 'M' },
+    { name: 'An', color: '#27ae60', initial: 'A' },
+    { name: 'Bảo', color: '#e74c3c', initial: 'B' },
+    { name: 'Chi', color: '#f39c12', initial: 'C' },
+];
+
+function stickmanSVG(color = '#fff') {
+    return `<svg class="stickman-svg" viewBox="0 0 40 60">
+        <circle cx="20" cy="12" r="9" fill="${color}" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>
+        <circle cx="17" cy="11" r="1.5" fill="rgba(0,0,0,0.7)"/>
+        <circle cx="23" cy="11" r="1.5" fill="rgba(0,0,0,0.7)"/>
+        <path d="M16 15 Q20 18 24 15" stroke="rgba(0,0,0,0.7)" stroke-width="1.5" fill="none"/>
+        <line x1="20" y1="21" x2="20" y2="40" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="20" y1="28" x2="8" y2="34" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="20" y1="28" x2="32" y2="34" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="20" y1="40" x2="12" y2="55" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="20" y1="40" x2="28" y2="55" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+    </svg>`;
+}
+
+function renderSlots() {
+    const container = document.getElementById('playerSlots');
+    if (!container) return;
+    container.innerHTML = '';
+    const total = 10;
+    for (let i = 0; i < total; i++) {
+        const wrap = document.createElement('div');
+        wrap.className = 'flex flex-col items-center gap-1';
+        if (i < players.length) {
+            const p = players[i];
+            wrap.innerHTML = `
+                <div class="relative">${stickmanSVG(p.color)}</div>
+                <div class="wooden-block"></div>
+                <div class="bg-surface-container rounded-full px-2 py-0.5 text-xs font-bold text-on-surface whitespace-nowrap">${p.name}</div>
+            `;
         } else {
-          dayImg.style.display = 'block';
-          nightImg.style.display = 'none';
+            wrap.innerHTML = `
+                <div class="opacity-30">${stickmanSVG('#888')}</div>
+                <div class="wooden-block opacity-40"></div>
+                <div class="bg-surface-variant rounded-full px-2 py-0.5 text-xs text-on-surface-variant opacity-60">Trống</div>
+            `;
         }
-      }
-      
-      // Update reference thumbnail
-      const refThumb = document.getElementById('refThumbImg');
-      if (refThumb) {
-        refThumb.src = newTheme === 'night' 
-          ? 'https://i.postimg.cc/mgj0gCxp/trong-tran-2.jpg'
-          : 'https://i.postimg.cc/d3gS3n36/loppy.jpg';
-      }
+        container.appendChild(wrap);
     }
-    
-    // ===== REFERENCE GALLERY =====
-    function openRefGallery() {
-      document.getElementById('refGallery').classList.add('active');
-    }
-    
-    function closeRefGallery() {
-      document.getElementById('refGallery').classList.remove('active');
-    }
-    
-    // Close gallery on ESC key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeRefGallery();
+}
+
+function simulateJoin() {
+    const fakeNames = ['Lan','Hùng','Phương','Tuấn','Mai','Sơn','Vy','Khánh'];
+    const colors = ['#1abc9c','#e67e22','#9b59b6','#34495e','#16a085','#c0392b'];
+    if (players.length >= 10) return;
+    const n = fakeNames[Math.floor(Math.random() * fakeNames.length)] + Math.floor(Math.random() * 99);
+    players.push({
+        name: n,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        initial: n[0]
     });
-    
-    // ===== SCREEN NAVIGATION =====
-    function showScreen(screenId) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById('screen-' + screenId).classList.add('active');
-    }
-    
-    // ===== SAMPLE PLAYERS =====
-    const players = [
-      { name: 'Lucas', isBot: false, avatar: '#9b59b6', initial: 'L' },
-      { name: 'Minh', isBot: false, avatar: '#3498db', initial: 'M' },
-      { name: 'An', isBot: false, avatar: '#27ae60', initial: 'A' },
-      { name: 'Bảo', isBot: false, avatar: '#e74c3c', initial: 'B' },
-      { name: 'Chi', isBot: false, avatar: '#f39c12', initial: 'C' },
-    ];
-    
-    // ===== GENERATE STICKMAN SVG =====
-    function generateStickmanSVG(color = '#9b59b6') {
-      return `
-        <svg viewBox="0 0 40 50">
-          <circle cx="20" cy="10" r="8" fill="${color}"/>
-          <circle cx="17" cy="9" r="1.5" fill="white"/>
-          <circle cx="23" cy="9" r="1.5" fill="white"/>
-          <path d="M16 13 Q20 16 24 13" stroke="white" stroke-width="1.5" fill="none"/>
-          <line x1="20" y1="18" x2="20" y2="35" stroke="${color}" stroke-width="3"/>
-          <line x1="20" y1="25" x2="8" y2="30" stroke="${color}" stroke-width="3"/>
-          <line x1="20" y1="25" x2="32" y2="30" stroke="${color}" stroke-width="3"/>
-          <line x1="20" y1="35" x2="12" y2="48" stroke="${color}" stroke-width="3"/>
-          <line x1="20" y1="35" x2="28" y2="48" stroke="${color}" stroke-width="3"/>
-        </svg>
-      `;
-    }
-    
-    // ===== GENERATE PLAYER SLOTS =====
-    function generatePlayerSlots(containerId, count = 10, filledCount = 5) {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      
-      container.innerHTML = '';
-      
-      for (let i = 0; i < count; i++) {
-        const slot = document.createElement('div');
-        slot.className = 'wooden-block ' + (i < filledCount ? 'filled' : 'empty');
-        
-        if (i < filledCount && players[i]) {
-          const player = players[i];
-          slot.innerHTML = `
-            <div class="stickman-container">
-              <div class="stickman-avatar discord-avatar" style="border-color: ${player.avatar}">
-                <div style="width: 100%; height: 100%; background: ${player.avatar}; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.2rem;">
-                  ${player.initial}
-                </div>
-              </div>
+    renderSlots();
+}
+
+// ===== Rooms =====
+const rooms = [
+    { id: 'VN-8821', name: 'Làng Sói Cô Đơn', players: '12/16', status: 'waiting' },
+    { id: 'VN-9045', name: 'Trăng Tròn Đêm Nay', players: '8/12', status: 'waiting' },
+    { id: 'VN-1123', name: 'Chuyên Gia Bịp', players: '15/16', status: 'waiting' },
+    { id: 'VN-7742', name: 'Giải Đấu Cuối Tuần', players: '16/16', status: 'full' },
+];
+
+function renderRooms() {
+    const grid = document.getElementById('roomGrid');
+    if (!grid) return;
+    grid.innerHTML = rooms.map(r => `
+        <div class="glass-panel p-unit-3 rounded-lg flex flex-col gap-unit-2 border border-outline-variant/30 hover:border-primary/50 transition-colors group ${r.status === 'full' ? 'opacity-70' : ''}">
+            <div class="flex justify-between items-start">
+                <span class="font-label-caps text-xs text-primary bg-primary/10 px-2 py-1 rounded">#${r.id}</span>
+                <span class="flex items-center gap-1 ${r.status === 'full' ? 'text-error bg-error/10' : 'text-secondary bg-secondary/10'} text-sm font-bold px-2 py-0.5 rounded-full">
+                    <div class="w-2 h-2 rounded-full ${r.status === 'full' ? 'bg-error' : 'bg-secondary animate-pulse'}"></div>
+                    ${r.status === 'full' ? 'Đã Đầy' : 'Đang chờ'}
+                </span>
             </div>
-            <div class="wooden-stump"></div>
-            <span class="player-name" style="background: ${player.avatar}; color: white;">${player.name}</span>
-            <span class="player-status ready">✓ Sẵn sàng</span>
-          `;
-        } else {
-          slot.innerHTML = `
-            <div class="stickman-container" style="opacity: 0.3;">
-              <div class="stickman-avatar">
-                ${generateStickmanSVG('#888')}
-              </div>
+            <h3 class="font-bold text-on-surface mt-1 truncate">${r.name}</h3>
+            <div class="flex items-center gap-2 text-on-surface-variant text-sm mt-auto pt-2 border-t border-outline-variant/10">
+                <span class="material-symbols-outlined text-sm">group</span>${r.players}
+                <button class="ml-auto bg-surface-variant text-on-surface hover:bg-primary hover:text-on-primary px-4 py-1.5 rounded-md font-bold text-sm transition-colors ${r.status === 'full' ? 'bg-surface-variant text-outline cursor-not-allowed' : ''}" ${r.status === 'full' ? 'disabled' : ''} onclick="${r.status === 'full' ? '' : 'showScreen(\\'room\\')'}">
+                    ${r.status === 'full' ? 'Đầy' : 'Vào'}
+                </button>
             </div>
-            <div class="wooden-stump" style="opacity: 0.5;"></div>
-            <span class="player-name" style="opacity: 0.5;">Trống</span>
-            <span class="player-status waiting">Chờ...</span>
-          `;
-        }
-        
-        container.appendChild(slot);
-      }
-    }
-    
-    // ===== CHAT FUNCTIONS =====
-    function sendMessage() {
-      const input = document.getElementById('chatInput');
-      if (!input) return;
-      
-      const message = input.value.trim();
-      if (!message) return;
-      
-      const messagesContainer = document.getElementById('chatMessages');
-      const newMessage = document.createElement('div');
-      newMessage.className = 'chat-message';
-      newMessage.innerHTML = `
-        <div class="chat-message-avatar" style="background: #9b59b6;">L</div>
-        <div class="chat-message-content">
-          <div class="chat-message-header">
-            <span class="chat-message-author">Lucas</span>
-            <span class="chat-message-time">${new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}</span>
-          </div>
-          <div class="chat-message-text">${message}</div>
         </div>
-      `;
-      messagesContainer.appendChild(newMessage);
-      messagesContainer.scrollTop = messagesContainer.scrollHeight;
-      input.value = '';
-    }
-    
-    function handleChatKeypress(event) {
-      if (event.key === 'Enter') {
-        sendMessage();
-      }
-    }
-    
-    // ===== LOADING ANIMATION =====
-    function simulateLoading() {
-      const loadingScreen = document.getElementById('loadingScreen');
-      const percentEl = document.getElementById('loadingPercent');
-      const statusEl = document.getElementById('loadingText');
-      
-      const stages = [
-        { percent: 20, text: 'Loading Discord SDK...' },
-        { percent: 40, text: 'Connecting to server...' },
-        { percent: 60, text: 'Fetching user data...' },
-        { percent: 80, text: 'Initializing game...' },
-        { percent: 100, text: 'Ready!' },
-      ];
-      
-      let stageIndex = 0;
-      
-      const interval = setInterval(() => {
-        if (stageIndex >= stages.length) {
-          clearInterval(interval);
-          loadingScreen.classList.add('fade-out');
-          setTimeout(() => {
-            showScreen('lobby');
-          }, 500);
-          return;
-        }
-        
-        const stage = stages[stageIndex];
-        percentEl.textContent = stage.percent;
-        statusEl.textContent = stage.text;
-        stageIndex++;
-      }, 600);
-    }
-    
-    // ===== INITIALIZE =====
-    document.addEventListener('DOMContentLoaded', () => {
-      // Generate player slots
-      generatePlayerSlots('playerSlots', 10, 5);
-      generatePlayerSlots('mobilePlayerSlots', 6, 4);
-      
-      // Start loading animation after a short delay
-      setTimeout(simulateLoading, 1000);
-    });
-  </script>
+    `).join('');
+}
+
+function refreshRooms() {
+    // Shuffle numbers for demo
+    rooms[0].players = `${Math.floor(Math.random()*6)+10}/16`;
+    rooms[1].players = `${Math.floor(Math.random()*5)+7}/12`;
+    renderRooms();
+}
+
+// ===== Chat =====
+const seedChat = [
+    { user: 'SóiCôĐộc', color: 'text-tertiary', text: 'Ai chơi phòng 16 người không?' },
+    { user: 'TiênTri123', color: 'text-primary', text: 'Xin link phòng bạn ơi' },
+    { user: 'ThợSănĐêm', color: 'text-[#e65100]', text: 'Vào phòng #VN-8821 đi, còn thiếu 4 slot nữa' },
+    { user: 'PhápSư', color: 'text-secondary', text: 'Game này hay lắm, ai mới chưa biết luật không?' },
+    { user: 'BạchDinh', color: 'text-tertiary', text: 'Mình mới, ai chỉ với 😭' },
+];
+
+function renderSeedChat() {
+    const log = document.getElementById('chatLog');
+    if (!log) return;
+    log.innerHTML = seedChat.map(m => `
+        <div class="flex flex-col gap-1 animate-fadeIn">
+            <div class="flex items-baseline gap-2">
+                <span class="font-bold text-sm ${m.color}">${m.user}</span>
+                <span class="text-[10px] text-outline">10:42</span>
+            </div>
+            <div class="bg-surface-container rounded-lg rounded-tl-none p-2 text-sm text-on-surface inline-block max-w-[90%] break-words">${m.text}</div>
+        </div>
+    `).join('');
+    log.scrollTop = log.scrollHeight;
+}
+
+function addMessage() {
+    const input = document.getElementById('chatInput');
+    const log = document.getElementById('chatLog');
+    const text = input.value.trim();
+    if (!text) return;
+    const now = new Date();
+    const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    log.insertAdjacentHTML('beforeend', `
+        <div class="flex flex-col gap-1 animate-fadeIn">
+            <div class="flex items-baseline gap-2">
+                <span class="font-bold text-sm text-secondary">Bạn (Người Chơi)</span>
+                <span class="text-[10px] text-outline">${timeStr}</span>
+            </div>
+            <div class="bg-primary/10 border border-primary/20 rounded-lg rounded-tl-none p-2 text-sm text-on-surface inline-block max-w-[90%] break-words">${text}</div>
+        </div>
+    `);
+    input.value = '';
+    log.scrollTop = log.scrollHeight;
+}
+
+// ===== Init =====
+window.addEventListener('DOMContentLoaded', () => {
+    renderRooms();
+    renderSeedChat();
+    renderSlots();
+});
+</script>
 </body>
 </html>
