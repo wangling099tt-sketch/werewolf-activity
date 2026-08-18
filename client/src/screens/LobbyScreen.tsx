@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { getAvatarUrl } from '../hooks/useDiscordSdk';
 import { HowToPlay } from '../components/HowToPlay';
 import { RoomBrowser } from '../components/RoomBrowser';
+import { SettingsModal } from '../components/SettingsModal';
 import { sound } from '../utils/sound';
 
 interface LobbyScreenProps {
@@ -33,6 +34,7 @@ export default function LobbyScreen({ discord, onCreateRoom, onJoinRoom, connect
   const [roomCode, setRoomCode] = useState('');
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showRoomBrowser, setShowRoomBrowser] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   return (
     <motion.div 
@@ -181,6 +183,18 @@ export default function LobbyScreen({ discord, onCreateRoom, onJoinRoom, connect
           <Sparkles className="w-6 h-6" />
           <span>How to Play</span>
         </motion.button>
+
+        {/* Settings */}
+        <motion.button
+          className="wv-btn-ghost text-lg py-3 px-8 w-full"
+          variants={itemVariants}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => { sound.play('click'); setShowSettings(true); }}
+        >
+          <Settings className="w-5 h-5" />
+          <span>Settings</span>
+        </motion.button>
       </motion.div>
 
       {/* Quick Stats */}
@@ -232,6 +246,11 @@ export default function LobbyScreen({ discord, onCreateRoom, onJoinRoom, connect
             onJoinRoom={(id) => { setShowRoomBrowser(false); onJoinRoom(id); }}
           />
         )}
+      </AnimatePresence>
+
+      {/* Settings Modal */}
+      <AnimatePresence>
+        {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
       </AnimatePresence>
     </motion.div>
   );
