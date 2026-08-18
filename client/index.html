@@ -4,155 +4,9 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Sảnh Chờ - MA SÓI</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="/src/styles.css" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600&family=JetBrains+Mono:wght@600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script>
-tailwind.config = {
-    darkMode: "class",
-    theme: {
-        extend: {
-            "colors": {
-                "on-error": "#ffffff",
-                "on-secondary": "#ffffff",
-                "outline": "#6e7880",
-                "on-primary-fixed-variant": "#004c6a",
-                "on-surface": "#1c1c19",
-                "error-container": "#ffdad6",
-                "surface-dim": "#dcdad5",
-                "on-tertiary-fixed-variant": "#6b00af",
-                "secondary-fixed": "#ffdcbc",
-                "primary-container": "#2bb2ee",
-                "on-secondary-fixed-variant": "#683d00",
-                "inverse-on-surface": "#f3f0eb",
-                "inverse-primary": "#7fd0ff",
-                "primary-fixed-dim": "#7fd0ff",
-                "surface-bright": "#fcf9f4",
-                "on-tertiary": "#ffffff",
-                "outline-variant": "#bdc8d1",
-                "surface-container": "#f0ede8",
-                "surface-variant": "#e5e2dd",
-                "background": "#fcf9f4",
-                "primary": "#00658c",
-                "on-background": "#1c1c19",
-                "tertiary": "#862dcb",
-                "surface-container-highest": "#e5e2dd",
-                "surface": "#fcf9f4",
-                "tertiary-container": "#cb8bff",
-                "on-tertiary-container": "#5c0097",
-                "on-primary": "#ffffff",
-                "on-error-container": "#93000a",
-                "on-tertiary-fixed": "#2e004e",
-                "tertiary-fixed-dim": "#e0b6ff",
-                "surface-container-low": "#f6f3ee",
-                "on-primary-fixed": "#001e2d",
-                "error": "#ba1a1a",
-                "on-secondary-fixed": "#2c1700",
-                "secondary-fixed-dim": "#ffb86b",
-                "surface-container-high": "#ebe8e3",
-                "inverse-surface": "#31302d",
-                "secondary": "#895100",
-                "on-secondary-container": "#663b00",
-                "on-surface-variant": "#3e484f",
-                "primary-fixed": "#c5e7ff",
-                "surface-container-lowest": "#ffffff",
-                "tertiary-fixed": "#f2daff",
-                "on-primary-container": "#00415b",
-                "secondary-container": "#fd9d1a",
-                "surface-tint": "#00658c"
-            },
-            "borderRadius": {
-                "DEFAULT": "0.25rem",
-                "lg": "0.5rem",
-                "xl": "0.75rem",
-                "full": "9999px"
-            },
-            "spacing": {
-                "max-width": "1440px",
-                "margin-mobile": "16px",
-                "gutter": "24px",
-                "unit": "8px",
-                "margin-desktop": "48px"
-            },
-            "fontFamily": {
-                "headline-display": ["Plus Jakarta Sans"],
-                "body-md": ["Hanken Grotesk"],
-                "headline-lg": ["Plus Jakarta Sans"],
-                "headline-lg-mobile": ["Plus Jakarta Sans"],
-                "label-caps": ["JetBrains Mono"]
-            },
-            "fontSize": {
-                "headline-display": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
-                "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
-                "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "700" }],
-                "headline-lg-mobile": ["24px", { "lineHeight": "1.2", "fontWeight": "700" }],
-                "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "600" }]
-            }
-        }
-    }
-}
-</script>
-<style>
-.mechanical-btn {
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, background-color 0.2s ease;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.2);
-}
-.mechanical-btn:hover {
-    transform: scale(1.02) translateY(-2px);
-    box-shadow: 0 6px 0 rgba(0,0,0,0.2);
-}
-.mechanical-btn:active {
-    transform: scale(0.98) translateY(4px);
-    box-shadow: 0 0 0 rgba(0,0,0,0.2);
-}
-.chat-scroll::-webkit-scrollbar { width: 6px; }
-.chat-scroll::-webkit-scrollbar-track { background: transparent; }
-.chat-scroll::-webkit-scrollbar-thumb { background-color: #bdc8d1; border-radius: 20px; }
-.glass-panel {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-.dark .glass-panel {
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-.animate-fadeIn { animation: fadeIn 0.3s ease-out; }
-
-/* Background shader */
-.bg-shader {
-    position: fixed; inset: 0; z-index: -1;
-    background:
-      radial-gradient(ellipse at 20% 0%, rgba(43, 178, 238, 0.15), transparent 50%),
-      radial-gradient(ellipse at 80% 100%, rgba(134, 45, 203, 0.15), transparent 50%);
-    pointer-events: none;
-}
-.dark .bg-shader {
-    background:
-      radial-gradient(ellipse at 20% 0%, rgba(43, 178, 238, 0.08), transparent 50%),
-      radial-gradient(ellipse at 80% 100%, rgba(134, 45, 203, 0.1), transparent 50%);
-}
-
-/* Wooden block for waiting room */
-.wooden-block {
-    width: 80px; height: 60px;
-    background: linear-gradient(180deg, #c08552 0%, #8b5a2b 100%);
-    border-radius: 8px 8px 12px 12px;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 6px 16px rgba(0,0,0,0.4), inset 0 3px 0 rgba(255,255,255,0.2);
-    position: relative;
-}
-.wooden-block::before {
-    content: ''; position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
-    width: 60px; height: 16px;
-    background: radial-gradient(ellipse, rgba(139, 90, 43, 0.4), transparent 70%);
-    border-radius: 50%;
-}
-
-/* Stickman */
-.stickman-svg { width: 50px; height: 70px; }
-</style>
 </head>
 <body class="bg-background text-on-background min-h-screen flex flex-col font-body-md overflow-x-hidden relative">
 <div class="bg-shader"></div>
@@ -179,7 +33,7 @@ tailwind.config = {
 </header>
 
 <div class="flex flex-col md:flex-row flex-1 w-full max-w-max-width mx-auto pb-[80px] md:pb-0">
-<!-- Side Nav Bar (Desktop) -->
+<!-- Side Nav (Desktop) -->
 <nav class="hidden md:flex flex-col w-[320px] h-[calc(100vh-80px)] sticky top-[80px] left-0 bg-surface-container-low text-primary font-body-md border-r border-surface-container-highest p-unit-3 gap-unit-2 z-40">
 <div class="flex items-center gap-unit-3 p-unit-2 mb-unit-4 border-b border-outline-variant/20 pb-unit-4">
 <div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-lg" id="userAvatar">NC</div>
@@ -191,7 +45,7 @@ tailwind.config = {
 <a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-primary font-bold border-r-4 border-primary bg-primary-container/10" href="#" onclick="showScreen('lobby')">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>Trang chủ
 </a>
-<a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors active:scale-[0.98]" href="#" onclick="showScreen('lobby')">
+<a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors active:scale-[0.98]" href="#" onclick="showScreen('room')">
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">swords</span>Phòng chơi
 </a>
 <a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors active:scale-[0.98]" href="#">
@@ -201,7 +55,7 @@ tailwind.config = {
 <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_bag</span>Cửa hàng
 </a>
 <div class="mt-auto flex flex-col gap-unit-2 border-t border-outline-variant/20 pt-unit-4">
-<button class="w-full py-2 bg-tertiary text-on-tertiary rounded-lg font-bold hover:bg-tertiary-container hover:text-on-tertiary-container transition-colors mechanical-btn">
+<button class="mechanical-btn w-full py-2 bg-tertiary text-on-tertiary rounded-lg font-bold hover:bg-tertiary-container hover:text-on-tertiary-container transition-colors">
 Nâng cấp Premium
 </button>
 <a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors active:scale-[0.98]" href="#">
@@ -216,7 +70,7 @@ Nâng cấp Premium
 <!-- Main Content -->
 <main class="flex-1 flex flex-col lg:flex-row gap-gutter p-margin-mobile md:p-margin-desktop min-h-full">
 
-<!-- =============== SCREEN: LOBBY =============== -->
+<!-- SCREEN: LOBBY -->
 <section id="screen-lobby" class="flex-1 flex flex-col gap-gutter lg:w-[70%]">
 <section class="glass-panel rounded-xl p-8 flex flex-col items-center justify-center text-center relative overflow-hidden min-h-[260px] border border-outline-variant/20">
 <div class="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none"></div>
@@ -239,9 +93,7 @@ Nâng cấp Premium
 <span class="material-symbols-outlined text-sm">refresh</span>Làm mới
 </button>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-unit-3" id="roomGrid">
-<!-- Room cards rendered by JS -->
-</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-unit-3" id="roomGrid"></div>
 </section>
 
 <section class="flex flex-col gap-unit-3 mt-8">
@@ -280,7 +132,7 @@ Xem tất cả <span class="material-symbols-outlined text-sm">arrow_forward</sp
 </section>
 </section>
 
-<!-- =============== SCREEN: ROOM (Waiting + Day/Night + Sticks) =============== -->
+<!-- SCREEN: ROOM -->
 <section id="screen-room" class="flex-1 flex-col gap-gutter lg:w-[70%] hidden">
 <div class="glass-panel rounded-xl p-6 border border-outline-variant/20 flex flex-col gap-4">
 <div class="flex flex-wrap items-center justify-between gap-3">
@@ -298,11 +150,7 @@ Xem tất cả <span class="material-symbols-outlined text-sm">arrow_forward</sp
 </button>
 </div>
 </div>
-
-<!-- Wooden blocks with stickmen -->
-<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 p-4 bg-surface-container-low rounded-lg" id="playerSlots">
-</div>
-
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 p-4 bg-surface-container-low rounded-lg" id="playerSlots"></div>
 <div class="flex justify-between items-center pt-2">
 <button class="mechanical-btn px-4 py-2 bg-surface-variant text-on-surface rounded-lg font-bold text-sm flex items-center gap-2" onclick="showScreen('lobby')">
 <span class="material-symbols-outlined text-sm">arrow_back</span>Quay lại
@@ -314,7 +162,7 @@ Xem tất cả <span class="material-symbols-outlined text-sm">arrow_forward</sp
 </div>
 </section>
 
-<!-- Right Column: Chat Box (sticky sidebar) -->
+<!-- Chat Box (sticky sidebar) -->
 <aside class="lg:w-[30%] flex flex-col h-[500px] lg:h-auto lg:min-h-[600px] glass-panel rounded-xl border border-outline-variant/20 overflow-hidden shadow-sm">
 <div class="bg-surface-container-high p-4 border-b border-outline-variant/20 flex items-center justify-between">
 <h3 class="font-bold text-on-surface flex items-center gap-2">
@@ -358,7 +206,6 @@ Xem tất cả <span class="material-symbols-outlined text-sm">arrow_forward</sp
 </nav>
 
 <script>
-// ===== Theme =====
 function toggleTheme() {
     const html = document.documentElement;
     const icon = document.querySelector('.theme-icon');
@@ -371,21 +218,19 @@ function toggleTheme() {
     }
 }
 
-// ===== Screen navigation =====
 function showScreen(id) {
     const lobby = document.getElementById('screen-lobby');
     const room = document.getElementById('screen-room');
     if (id === 'lobby') {
         lobby.classList.remove('hidden'); lobby.style.display = '';
         room.classList.add('hidden'); room.style.display = 'none';
-    } else if (id === 'room') {
+    } else {
         lobby.classList.add('hidden'); lobby.style.display = 'none';
         room.classList.remove('hidden'); room.style.display = 'flex';
         renderSlots();
     }
 }
 
-// ===== Day / Night =====
 let isNight = false;
 function toggleDayNight() {
     isNight = !isNight;
@@ -393,16 +238,15 @@ function toggleDayNight() {
     document.getElementById('phaseLabel').textContent = isNight ? 'Ban Đêm' : 'Ban Ngày';
 }
 
-// ===== Players =====
 const players = [
-    { name: 'Lucas', color: '#9b59b6', initial: 'L' },
-    { name: 'Minh', color: '#3498db', initial: 'M' },
-    { name: 'An', color: '#27ae60', initial: 'A' },
-    { name: 'Bảo', color: '#e74c3c', initial: 'B' },
-    { name: 'Chi', color: '#f39c12', initial: 'C' },
+    { name: 'Lucas', color: '#9b59b6' },
+    { name: 'Minh', color: '#3498db' },
+    { name: 'An', color: '#27ae60' },
+    { name: 'Bảo', color: '#e74c3c' },
+    { name: 'Chi', color: '#f39c12' },
 ];
 
-function stickmanSVG(color = '#fff') {
+function stickmanSVG(color) {
     return `<svg class="stickman-svg" viewBox="0 0 40 60">
         <circle cx="20" cy="12" r="9" fill="${color}" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>
         <circle cx="17" cy="11" r="1.5" fill="rgba(0,0,0,0.7)"/>
@@ -417,45 +261,30 @@ function stickmanSVG(color = '#fff') {
 }
 
 function renderSlots() {
-    const container = document.getElementById('playerSlots');
-    if (!container) return;
-    container.innerHTML = '';
-    const total = 10;
-    for (let i = 0; i < total; i++) {
+    const c = document.getElementById('playerSlots');
+    if (!c) return;
+    c.innerHTML = '';
+    for (let i = 0; i < 10; i++) {
         const wrap = document.createElement('div');
         wrap.className = 'flex flex-col items-center gap-1';
         if (i < players.length) {
             const p = players[i];
-            wrap.innerHTML = `
-                <div class="relative">${stickmanSVG(p.color)}</div>
-                <div class="wooden-block"></div>
-                <div class="bg-surface-container rounded-full px-2 py-0.5 text-xs font-bold text-on-surface whitespace-nowrap">${p.name}</div>
-            `;
+            wrap.innerHTML = `<div class="relative">${stickmanSVG(p.color)}</div><div class="wooden-block"></div><div class="bg-surface-container rounded-full px-2 py-0.5 text-xs font-bold text-on-surface whitespace-nowrap">${p.name}</div>`;
         } else {
-            wrap.innerHTML = `
-                <div class="opacity-30">${stickmanSVG('#888')}</div>
-                <div class="wooden-block opacity-40"></div>
-                <div class="bg-surface-variant rounded-full px-2 py-0.5 text-xs text-on-surface-variant opacity-60">Trống</div>
-            `;
+            wrap.innerHTML = `<div class="opacity-30">${stickmanSVG('#888')}</div><div class="wooden-block opacity-40"></div><div class="bg-surface-variant rounded-full px-2 py-0.5 text-xs text-on-surface-variant opacity-60">Trống</div>`;
         }
-        container.appendChild(wrap);
+        c.appendChild(wrap);
     }
 }
 
 function simulateJoin() {
-    const fakeNames = ['Lan','Hùng','Phương','Tuấn','Mai','Sơn','Vy','Khánh'];
-    const colors = ['#1abc9c','#e67e22','#9b59b6','#34495e','#16a085','#c0392b'];
+    const names = ['Lan','Hùng','Phương','Tuấn','Mai','Sơn','Vy','Khánh'];
+    const cols = ['#1abc9c','#e67e22','#9b59b6','#34495e','#16a085','#c0392b'];
     if (players.length >= 10) return;
-    const n = fakeNames[Math.floor(Math.random() * fakeNames.length)] + Math.floor(Math.random() * 99);
-    players.push({
-        name: n,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        initial: n[0]
-    });
+    players.push({ name: names[Math.floor(Math.random()*names.length)] + Math.floor(Math.random()*99), color: cols[Math.floor(Math.random()*cols.length)] });
     renderSlots();
 }
 
-// ===== Rooms =====
 const rooms = [
     { id: 'VN-8821', name: 'Làng Sói Cô Đơn', players: '12/16', status: 'waiting' },
     { id: 'VN-9045', name: 'Trăng Tròn Đêm Nay', players: '8/12', status: 'waiting' },
@@ -464,9 +293,9 @@ const rooms = [
 ];
 
 function renderRooms() {
-    const grid = document.getElementById('roomGrid');
-    if (!grid) return;
-    grid.innerHTML = rooms.map(r => `
+    const g = document.getElementById('roomGrid');
+    if (!g) return;
+    g.innerHTML = rooms.map(r => `
         <div class="glass-panel p-unit-3 rounded-lg flex flex-col gap-unit-2 border border-outline-variant/30 hover:border-primary/50 transition-colors group ${r.status === 'full' ? 'opacity-70' : ''}">
             <div class="flex justify-between items-start">
                 <span class="font-label-caps text-xs text-primary bg-primary/10 px-2 py-1 rounded">#${r.id}</span>
@@ -487,13 +316,11 @@ function renderRooms() {
 }
 
 function refreshRooms() {
-    // Shuffle numbers for demo
     rooms[0].players = `${Math.floor(Math.random()*6)+10}/16`;
     rooms[1].players = `${Math.floor(Math.random()*5)+7}/12`;
     renderRooms();
 }
 
-// ===== Chat =====
 const seedChat = [
     { user: 'SóiCôĐộc', color: 'text-tertiary', text: 'Ai chơi phòng 16 người không?' },
     { user: 'TiênTri123', color: 'text-primary', text: 'Xin link phòng bạn ơi' },
@@ -537,7 +364,6 @@ function addMessage() {
     log.scrollTop = log.scrollHeight;
 }
 
-// ===== Init =====
 window.addEventListener('DOMContentLoaded', () => {
     renderRooms();
     renderSeedChat();

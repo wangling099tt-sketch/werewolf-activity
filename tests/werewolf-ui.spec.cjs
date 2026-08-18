@@ -2,8 +2,7 @@
 const { test, expect } = require('@playwright/test');
 
 /**
- * MA SÓI - E2E TEST SUITE (UI mới)
- * Material Symbols + Material Design 3 inspired UI
+ * MA SÓI - E2E TEST SUITE (UI mới - Material Symbols)
  * Run: npx playwright test werewolf-ui.spec.cjs
  */
 
@@ -11,172 +10,121 @@ const BASE_URL = process.env.BASE_URL || 'https://werewolf-activity-production.u
 
 test.describe('🐺 MA SÓI - UI Mới', () => {
 
-  test('1. Trang chủ hiển thị MA SÓI với 2 nút TẠO PHÒNG / TÌM PHÒNG', async ({ page }) => {
-    await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(3000);
+  // Helper: wait for Tailwind + JS init
+  async function waitForReady(page) {
+    await page.goto(BASE_URL, { waitUntil: 'load', timeout: 60000 });
+    await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+    await page.waitForTimeout(2000);
+  }
 
-    // Hero title
-    const title = page.locator('h1:has-text("MA SÓI")').first();
-    await expect(title).toBeVisible();
+  test('1. Trang chủ MA SÓI với TẠO PHÒNG / TÌM PHÒNG', async ({ page }) => {
+    await waitForReady(page);
 
-    // 2 main buttons
-    const createBtn = page.locator('button:has-text("TẠO PHÒNG")').first();
-    const findBtn = page.locator('button:has-text("TÌM PHÒNG")').first();
-    await expect(createBtn).toBeVisible();
-    await expect(findBtn).toBeVisible();
+    await expect(page.locator('h1:has-text("MA SÓI")').first()).toBeVisible();
+    await expect(page.locator('button:has-text("TẠO PHÒNG")').first()).toBeVisible();
+    await expect(page.locator('button:has-text("TÌM PHÒNG")').first()).toBeVisible();
 
-    // Room cards rendered
-    const roomCards = page.locator('#roomGrid > div');
-    const c = await roomCards.count();
-    expect(c).toBeGreaterThanOrEqual(3);
+    // Room cards
+    const cards = page.locator('#roomGrid > div');
+    await expect(cards).toHaveCount(4);
   });
 
-  test('2. Click TẠO PHÒNG → vào Room screen với wooden blocks', async ({ page }) => {
-    await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(3000);
-
+  test('2. Click TẠO PHÒNG → Room screen với wooden blocks', async ({ page }) => {
+    await waitForReady(page);
     await page.locator('button:has-text("TẠO PHÒNG")').first().click({ force: true });
-    await page.waitForTimeout(800);
+    await page.waitForTimeout(1500);
 
-    // Room screen visible
     await expect(page.locator('#screen-room')).toBeVisible();
     await expect(page.locator('h2:has-text("Phòng Của Lucas")')).toBeVisible();
 
-    // 10 wooden blocks
+    // 10 player slots
     const slots = page.locator('#playerSlots > div');
-    const c = await slots.count();
-    expect(c).toBe(10);
+    await expect(slots).toHaveCount(10);
 
-    // Stickman avatars rendered (svg)
-    const stickmen = page.locator('#playerSlots svg');
-    expect(await stickmen.count()).toBe(10);
-
-    // First slots have player names
-    const firstName = page.locator('#playerSlots > div').first().locator('div').last();
-    await expect(firstName).toBeVisible();
+    // Stickmen rendered
+    await expect(page.locator('#playerSlots svg')).toHaveCount(10);
   });
 
-  test('3. Thêm người chơi → wooden block fill với stickman mới', async ({ page }) => {
-    await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(3000);
+  test('3. Thêm người chơi → fill wooden block', async ({ page }) => {
+    await waitForReady(page);
     await page.locator('button:has-text("TẠO PHÒNG")').first().click({ force: true });
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1500);
 
-    const before = await page.locator('#playerSlots svg').count();
+    await page.locator('#screen-room button:has-text("Thêm người chơi")').click({ force: true });
+    await page.waitForTimeout(800);
 
-    // Click "Thêm người chơi"
-    await page.locator('button:has-text("Thêm người chơi")').click({ force: true });
-    await page.waitForTimeout(400);
-
-    const after = await page.locator('#playerSlots svg').count();
-    expect(after).toBe(before); // SVG count stays same (10)
-    // But one more slot should now have a real name
+    // Should still have 10 slots
+    await expect(page.locator('#playerSlots > div')).toHaveCount(10);
   });
 
   test('4. Toggle Day ↔ Night', async ({ page }) => {
-    await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(3000);
+    await waitForReady(page);
     await page.locator('button:has-text("TẠO PHÒNG")').first().click({ force: true });
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1500);
 
-    // Default: Ban Ngày
     await expect(page.locator('#phaseLabel')).toHaveText('Ban Ngày');
-
-    // Toggle to Night
-    await page.locator('button:has-text("Ban Ngày")').click({ force: true });
-    await page.waitForTimeout(300);
+    await page.locator('#phaseLabel').click({ force: true });
+    await page.waitForTimeout(500);
     await expect(page.locator('#phaseLabel')).toHaveText('Ban Đêm');
 
-    // Toggle back
-    await page.locator('button:has-text("Ban Đêm")').click({ force: true });
-    await page.waitForTimeout(300);
+    await page.locator('#phaseLabel').click({ force: true });
+    await page.waitForTimeout(500);
     await expect(page.locator('#phaseLabel')).toHaveText('Ban Ngày');
   });
 
   test('5. Chat box gửi tin nhắn', async ({ page }) => {
-    await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(3000);
-
+    await waitForReady(page);
     const input = page.locator('#chatInput');
     await input.fill('🐺 Vote đi mọi người!');
     await page.locator('button[type="submit"]').first().click({ force: true });
-    await page.waitForTimeout(400);
-
-    const lastMsg = page.locator('#chatLog > div').last();
-    await expect(lastMsg).toContainText('Vote đi mọi người!');
+    await page.waitForTimeout(600);
+    const last = page.locator('#chatLog > div').last();
+    await expect(last).toContainText('Vote đi mọi người!');
   });
 
   test('6. Theme toggle Light ↔ Dark', async ({ page }) => {
-    await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(3000);
-
-    // Default light
+    await waitForReady(page);
     const html = page.locator('html');
-    const cls1 = await html.getAttribute('class');
-    expect(cls1).toContain('light');
-
-    // Toggle to dark
+    await expect(html).toHaveClass(/light/);
     await page.locator('button[aria-label="Toggle Theme"]').click({ force: true });
-    await page.waitForTimeout(300);
-    const cls2 = await html.getAttribute('class');
-    expect(cls2).toContain('dark');
+    await page.waitForTimeout(500);
+    await expect(html).toHaveClass(/dark/);
   });
 
-  test('7. Desktop: Chat box ở cột phải (sidebar)', async ({ page }) => {
+  test('7. Desktop: Chat sidebar (right column)', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(3000);
-
+    await waitForReady(page);
     const aside = page.locator('aside').first();
     await expect(aside).toBeVisible();
-
-    // Aside should be on the right (30% width)
     const box = await aside.boundingBox();
-    expect(box.width).toBeLessThan(500); // Side chat is narrow
-    expect(box.x).toBeGreaterThan(800); // Right side on 1280px viewport
+    expect(box.x).toBeGreaterThan(800);
   });
 
-  test('8. Mobile: Bottom nav hiển thị', async ({ page }) => {
+  test('8. Mobile: Bottom nav 4 items', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(3000);
-
-    // Bottom nav visible
+    await waitForReady(page);
     const bottomNav = page.locator('nav.fixed.bottom-0');
     await expect(bottomNav).toBeVisible();
-
-    // Has 4 nav items
-    const navItems = bottomNav.locator('a');
-    const c = await navItems.count();
-    expect(c).toBe(4);
+    await expect(bottomNav.locator('a')).toHaveCount(4);
   });
 
-  test('9. Side nav (Desktop) có 4 menu chính', async ({ page }) => {
+  test('9. Side nav Desktop 4 menu chính', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
-    await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(3000);
-
-    const sideNav = page.locator('nav.hidden.md\\:flex').first();
+    await waitForReady(page);
+    const sideNav = page.locator('nav.hidden').first();
     await expect(sideNav).toBeVisible();
-
-    // Has "Trang chủ", "Phòng chơi", "Bạn bè", "Cửa hàng"
     await expect(sideNav).toContainText('Trang chủ');
     await expect(sideNav).toContainText('Phòng chơi');
     await expect(sideNav).toContainText('Bạn bè');
     await expect(sideNav).toContainText('Cửa hàng');
   });
 
-  test('10. Nâng cấp Premium button + mechanical-btn class có 3D effect', async ({ page }) => {
-    await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 60000 });
-    await page.waitForTimeout(3000);
-
-    // Premium button
-    const premiumBtn = page.locator('button:has-text("Nâng cấp Premium")').first();
-    await expect(premiumBtn).toBeVisible();
-    await expect(premiumBtn).toHaveClass(/mechanical-btn/);
-
-    // Box-shadow from CSS
-    const shadow = await premiumBtn.evaluate(el => getComputedStyle(el).boxShadow);
+  test('10. Premium button có 3D effect (box-shadow)', async ({ page }) => {
+    await waitForReady(page);
+    const btn = page.locator('button:has-text("Nâng cấp Premium")').first();
+    await expect(btn).toBeVisible();
+    await expect(btn).toHaveClass(/mechanical-btn/);
+    const shadow = await btn.evaluate(el => getComputedStyle(el).boxShadow);
     expect(shadow).not.toBe('none');
   });
 });

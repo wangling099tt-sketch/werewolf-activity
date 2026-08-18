@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html class="light" lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sảnh Chờ - MA SÓI</title>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600&family=JetBrains+Mono:wght@600&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" crossorigin href="/assets/main-iY_cWto9.css">
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-md overflow-x-hidden relative">
+<div class="bg-shader"></div>
+
+<!-- Top App Bar -->
+<header class="bg-background/80 backdrop-blur-md text-primary font-headline-lg docked w-full top-0 sticky flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 z-50 bg-surface-container-low border-b border-surface-container-highest">
+<div class="flex items-center gap-unit-2 font-headline-lg font-extrabold text-primary tracking-tighter">
+<span>MA SÓI</span>
+</div>
+<div class="flex items-center gap-unit-3">
+<button aria-label="Toggle Theme" class="text-on-surface-variant hover:scale-105 transition-transform duration-200 active:scale-95 w-10 h-10 flex items-center justify-center rounded-full bg-surface-container hover:bg-surface-variant" onclick="toggleTheme()">
+<span class="material-symbols-outlined theme-icon" style="font-variation-settings: 'FILL' 1;">light_mode</span>
+</button>
+<button aria-label="Settings" class="text-on-surface-variant hover:scale-105 transition-transform duration-200 active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+</button>
+<button aria-label="Help" class="text-on-surface-variant hover:scale-105 transition-transform duration-200 active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">help</span>
+</button>
+<button aria-label="Account" class="text-on-surface-variant hover:scale-105 transition-transform duration-200 active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">account_circle</span>
+</button>
+</div>
+</header>
+
+<div class="flex flex-col md:flex-row flex-1 w-full max-w-max-width mx-auto pb-[80px] md:pb-0">
+<!-- Side Nav (Desktop) -->
+<nav class="hidden md:flex flex-col w-[320px] h-[calc(100vh-80px)] sticky top-[80px] left-0 bg-surface-container-low text-primary font-body-md border-r border-surface-container-highest p-unit-3 gap-unit-2 z-40">
+<div class="flex items-center gap-unit-3 p-unit-2 mb-unit-4 border-b border-outline-variant/20 pb-unit-4">
+<div class="w-12 h-12 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-lg" id="userAvatar">NC</div>
+<div>
+<h3 class="font-bold text-on-surface" id="userName">Người Chơi</h3>
+<p class="font-label-caps text-on-surface-variant text-xs">Cấp độ 15</p>
+</div>
+</div>
+<a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-primary font-bold border-r-4 border-primary bg-primary-container/10" href="#" onclick="showScreen('lobby')">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>Trang chủ
+</a>
+<a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors active:scale-[0.98]" href="#" onclick="showScreen('room')">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">swords</span>Phòng chơi
+</a>
+<a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">group</span>Bạn bè
+</a>
+<a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_bag</span>Cửa hàng
+</a>
+<div class="mt-auto flex flex-col gap-unit-2 border-t border-outline-variant/20 pt-unit-4">
+<button class="mechanical-btn w-full py-2 bg-tertiary text-on-tertiary rounded-lg font-bold hover:bg-tertiary-container hover:text-on-tertiary-container transition-colors">
+Nâng cấp Premium
+</button>
+<a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-variant transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>Cài đặt
+</a>
+<a class="flex items-center gap-unit-3 p-unit-2 rounded-lg text-error hover:bg-error-container transition-colors active:scale-[0.98]" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">logout</span>Đăng xuất
+</a>
+</div>
+</nav>
+
+<!-- Main Content -->
+<main class="flex-1 flex flex-col lg:flex-row gap-gutter p-margin-mobile md:p-margin-desktop min-h-full">
+
+<!-- SCREEN: LOBBY -->
+<section id="screen-lobby" class="flex-1 flex flex-col gap-gutter lg:w-[70%]">
+<section class="glass-panel rounded-xl p-8 flex flex-col items-center justify-center text-center relative overflow-hidden min-h-[260px] border border-outline-variant/20">
+<div class="absolute inset-0 bg-gradient-to-b from-primary/10 to-transparent pointer-events-none"></div>
+<h1 class="font-headline-display text-headline-display text-primary drop-shadow-md relative z-10 font-extrabold mb-2 uppercase tracking-widest">MA SÓI</h1>
+<p class="font-body-md text-on-surface-variant text-lg font-medium tracking-wide z-10">Social Deduction Game</p>
+<div class="flex flex-col sm:flex-row gap-4 mt-8 z-10 w-full sm:w-auto">
+<button class="mechanical-btn bg-gradient-to-r from-tertiary to-[#a259ff] text-on-tertiary px-8 py-3 rounded-lg font-label-caps text-label-caps flex items-center justify-center gap-2 flex-1 sm:flex-none border border-tertiary/50" onclick="showScreen('room')">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">add_circle</span>TẠO PHÒNG
+</button>
+<button class="mechanical-btn bg-primary text-on-primary px-8 py-3 rounded-lg font-label-caps text-label-caps flex items-center justify-center gap-2 flex-1 sm:flex-none border border-primary/50" onclick="showScreen('room')">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 0;">search</span>TÌM PHÒNG
+</button>
+</div>
+</section>
+
+<section class="flex flex-col gap-unit-3">
+<div class="flex justify-between items-center mb-2">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Phòng Đang Chờ</h2>
+<button class="text-primary hover:text-primary-container font-label-caps text-sm flex items-center gap-1 transition-colors" onclick="refreshRooms()">
+<span class="material-symbols-outlined text-sm">refresh</span>Làm mới
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-unit-3" id="roomGrid"></div>
+</section>
+
+<section class="flex flex-col gap-unit-3 mt-8">
+<div class="flex justify-between items-center mb-2">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Cửa Hàng Vật Phẩm</h2>
+<a class="text-primary hover:text-primary-container font-label-caps text-sm flex items-center gap-1 transition-colors" href="#">
+Xem tất cả <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="glass-panel rounded-xl overflow-hidden border border-outline-variant/30 hover:border-primary/50 transition-all group flex flex-col">
+<div class="relative h-40 overflow-hidden">
+<img alt="Nền Đêm Huyền Bí" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://i.postimg.cc/mgj0gCxp/trong-tran-2.jpg"/>
+<div class="absolute top-2 right-2 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-bold text-xs shadow-sm">500 Vàng</div>
+</div>
+<div class="p-4 flex flex-col gap-3">
+<h3 class="font-bold text-on-surface">Nền Đêm Huyền Bí</h3>
+<button class="mechanical-btn w-full py-2 bg-primary text-on-primary rounded-lg font-bold text-sm flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">shopping_cart</span>Mua
+</button>
+</div>
+</div>
+<div class="glass-panel rounded-xl overflow-hidden border border-outline-variant/30 hover:border-primary/50 transition-all group flex flex-col">
+<div class="relative h-40 overflow-hidden">
+<img alt="Nền Sáng Bình Minh" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://i.postimg.cc/D0N9nKRY/trong-tran-1.jpg"/>
+<div class="absolute top-2 right-2 bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full font-bold text-xs shadow-sm">500 Vàng</div>
+</div>
+<div class="p-4 flex flex-col gap-3">
+<h3 class="font-bold text-on-surface">Nền Sáng Bình Minh</h3>
+<button class="mechanical-btn w-full py-2 bg-primary text-on-primary rounded-lg font-bold text-sm flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">shopping_cart</span>Mua
+</button>
+</div>
+</div>
+</div>
+</section>
+</section>
+
+<!-- SCREEN: ROOM -->
+<section id="screen-room" class="flex-1 flex-col gap-gutter lg:w-[70%] hidden">
+<div class="glass-panel rounded-xl p-6 border border-outline-variant/20 flex flex-col gap-4">
+<div class="flex flex-wrap items-center justify-between gap-3">
+<div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">🏠 Phòng Của Lucas</h2>
+<p class="font-mono text-on-surface-variant text-sm mt-1">#WER-2847</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="mechanical-btn px-4 py-2 bg-primary text-on-primary rounded-lg font-bold text-sm flex items-center gap-2" onclick="toggleDayNight()">
+<span class="material-symbols-outlined text-sm" id="phaseIcon">wb_sunny</span>
+<span id="phaseLabel">Ban Ngày</span>
+</button>
+<button class="mechanical-btn px-4 py-2 bg-tertiary text-on-tertiary rounded-lg font-bold text-sm flex items-center gap-2" onclick="simulateJoin()">
+<span class="material-symbols-outlined text-sm">person_add</span>Thêm người chơi
+</button>
+</div>
+</div>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6 p-4 bg-surface-container-low rounded-lg" id="playerSlots"></div>
+<div class="flex justify-between items-center pt-2">
+<button class="mechanical-btn px-4 py-2 bg-surface-variant text-on-surface rounded-lg font-bold text-sm flex items-center gap-2" onclick="showScreen('lobby')">
+<span class="material-symbols-outlined text-sm">arrow_back</span>Quay lại
+</button>
+<button class="mechanical-btn bg-gradient-to-r from-tertiary to-[#a259ff] text-on-tertiary px-6 py-3 rounded-lg font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">play_arrow</span>Bắt đầu chơi
+</button>
+</div>
+</div>
+</section>
+
+<!-- Chat Box (sticky sidebar) -->
+<aside class="lg:w-[30%] flex flex-col h-[500px] lg:h-auto lg:min-h-[600px] glass-panel rounded-xl border border-outline-variant/20 overflow-hidden shadow-sm">
+<div class="bg-surface-container-high p-4 border-b border-outline-variant/20 flex items-center justify-between">
+<h3 class="font-bold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">chat</span>Kênh Thế Giới
+</h3>
+<div class="flex items-center gap-1 text-xs text-on-surface-variant">
+<div class="w-2 h-2 rounded-full bg-secondary animate-pulse"></div>1.2k Online
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 chat-scroll bg-surface/50" id="chatLog"></div>
+<div class="p-3 bg-surface-container-low border-t border-outline-variant/20">
+<form class="flex items-center gap-2 relative" onsubmit="event.preventDefault(); addMessage();">
+<input class="flex-1 bg-surface border border-outline-variant rounded-full py-2 pl-4 pr-10 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent font-body-md text-on-surface" id="chatInput" placeholder="Nhập tin nhắn..." type="text"/>
+<button class="absolute right-1 w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center hover:bg-primary/90 transition-colors active:scale-95" type="submit">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</form>
+</div>
+</aside>
+</main>
+</div>
+
+<!-- Bottom Nav (Mobile) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 rounded-t-xl border-t border-outline-variant/20 bg-background/90 backdrop-blur-xl text-primary font-label-caps flex justify-around items-center px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1 active:scale-90 transition-all" href="#" onclick="showScreen('lobby')">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="text-[10px]">Chính</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded-xl px-4 py-1 active:scale-90 transition-all" href="#" onclick="showScreen('room')">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">sports_esports</span>
+<span class="text-[10px]">Phòng</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded-xl px-4 py-1 active:scale-90 transition-all" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">leaderboard</span>
+<span class="text-[10px]">Xếp hạng</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant rounded-xl px-4 py-1 active:scale-90 transition-all" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="text-[10px]">Cá nhân</span>
+</a>
+</nav>
+
+<script>
+function toggleTheme() {
+    const html = document.documentElement;
+    const icon = document.querySelector('.theme-icon');
+    if (html.classList.contains('dark')) {
+        html.classList.remove('dark'); html.classList.add('light');
+        icon.textContent = 'light_mode';
+    } else {
+        html.classList.remove('light'); html.classList.add('dark');
+        icon.textContent = 'dark_mode';
+    }
+}
+
+function showScreen(id) {
+    const lobby = document.getElementById('screen-lobby');
+    const room = document.getElementById('screen-room');
+    if (id === 'lobby') {
+        lobby.classList.remove('hidden'); lobby.style.display = '';
+        room.classList.add('hidden'); room.style.display = 'none';
+    } else {
+        lobby.classList.add('hidden'); lobby.style.display = 'none';
+        room.classList.remove('hidden'); room.style.display = 'flex';
+        renderSlots();
+    }
+}
+
+let isNight = false;
+function toggleDayNight() {
+    isNight = !isNight;
+    document.getElementById('phaseIcon').textContent = isNight ? 'bedtime' : 'wb_sunny';
+    document.getElementById('phaseLabel').textContent = isNight ? 'Ban Đêm' : 'Ban Ngày';
+}
+
+const players = [
+    { name: 'Lucas', color: '#9b59b6' },
+    { name: 'Minh', color: '#3498db' },
+    { name: 'An', color: '#27ae60' },
+    { name: 'Bảo', color: '#e74c3c' },
+    { name: 'Chi', color: '#f39c12' },
+];
+
+function stickmanSVG(color) {
+    return `<svg class="stickman-svg" viewBox="0 0 40 60">
+        <circle cx="20" cy="12" r="9" fill="${color}" stroke="rgba(0,0,0,0.4)" stroke-width="1"/>
+        <circle cx="17" cy="11" r="1.5" fill="rgba(0,0,0,0.7)"/>
+        <circle cx="23" cy="11" r="1.5" fill="rgba(0,0,0,0.7)"/>
+        <path d="M16 15 Q20 18 24 15" stroke="rgba(0,0,0,0.7)" stroke-width="1.5" fill="none"/>
+        <line x1="20" y1="21" x2="20" y2="40" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="20" y1="28" x2="8" y2="34" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="20" y1="28" x2="32" y2="34" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="20" y1="40" x2="12" y2="55" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+        <line x1="20" y1="40" x2="28" y2="55" stroke="${color}" stroke-width="3.5" stroke-linecap="round"/>
+    </svg>`;
+}
+
+function renderSlots() {
+    const c = document.getElementById('playerSlots');
+    if (!c) return;
+    c.innerHTML = '';
+    for (let i = 0; i < 10; i++) {
+        const wrap = document.createElement('div');
+        wrap.className = 'flex flex-col items-center gap-1';
+        if (i < players.length) {
+            const p = players[i];
+            wrap.innerHTML = `<div class="relative">${stickmanSVG(p.color)}</div><div class="wooden-block"></div><div class="bg-surface-container rounded-full px-2 py-0.5 text-xs font-bold text-on-surface whitespace-nowrap">${p.name}</div>`;
+        } else {
+            wrap.innerHTML = `<div class="opacity-30">${stickmanSVG('#888')}</div><div class="wooden-block opacity-40"></div><div class="bg-surface-variant rounded-full px-2 py-0.5 text-xs text-on-surface-variant opacity-60">Trống</div>`;
+        }
+        c.appendChild(wrap);
+    }
+}
+
+function simulateJoin() {
+    const names = ['Lan','Hùng','Phương','Tuấn','Mai','Sơn','Vy','Khánh'];
+    const cols = ['#1abc9c','#e67e22','#9b59b6','#34495e','#16a085','#c0392b'];
+    if (players.length >= 10) return;
+    players.push({ name: names[Math.floor(Math.random()*names.length)] + Math.floor(Math.random()*99), color: cols[Math.floor(Math.random()*cols.length)] });
+    renderSlots();
+}
+
+const rooms = [
+    { id: 'VN-8821', name: 'Làng Sói Cô Đơn', players: '12/16', status: 'waiting' },
+    { id: 'VN-9045', name: 'Trăng Tròn Đêm Nay', players: '8/12', status: 'waiting' },
+    { id: 'VN-1123', name: 'Chuyên Gia Bịp', players: '15/16', status: 'waiting' },
+    { id: 'VN-7742', name: 'Giải Đấu Cuối Tuần', players: '16/16', status: 'full' },
+];
+
+function renderRooms() {
+    const g = document.getElementById('roomGrid');
+    if (!g) return;
+    g.innerHTML = rooms.map(r => `
+        <div class="glass-panel p-unit-3 rounded-lg flex flex-col gap-unit-2 border border-outline-variant/30 hover:border-primary/50 transition-colors group ${r.status === 'full' ? 'opacity-70' : ''}">
+            <div class="flex justify-between items-start">
+                <span class="font-label-caps text-xs text-primary bg-primary/10 px-2 py-1 rounded">#${r.id}</span>
+                <span class="flex items-center gap-1 ${r.status === 'full' ? 'text-error bg-error/10' : 'text-secondary bg-secondary/10'} text-sm font-bold px-2 py-0.5 rounded-full">
+                    <div class="w-2 h-2 rounded-full ${r.status === 'full' ? 'bg-error' : 'bg-secondary animate-pulse'}"></div>
+                    ${r.status === 'full' ? 'Đã Đầy' : 'Đang chờ'}
+                </span>
+            </div>
+            <h3 class="font-bold text-on-surface mt-1 truncate">${r.name}</h3>
+            <div class="flex items-center gap-2 text-on-surface-variant text-sm mt-auto pt-2 border-t border-outline-variant/10">
+                <span class="material-symbols-outlined text-sm">group</span>${r.players}
+                <button class="ml-auto bg-surface-variant text-on-surface hover:bg-primary hover:text-on-primary px-4 py-1.5 rounded-md font-bold text-sm transition-colors ${r.status === 'full' ? 'bg-surface-variant text-outline cursor-not-allowed' : ''}" ${r.status === 'full' ? 'disabled' : ''} onclick="${r.status === 'full' ? '' : 'showScreen(\\'room\\')'}">
+                    ${r.status === 'full' ? 'Đầy' : 'Vào'}
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function refreshRooms() {
+    rooms[0].players = `${Math.floor(Math.random()*6)+10}/16`;
+    rooms[1].players = `${Math.floor(Math.random()*5)+7}/12`;
+    renderRooms();
+}
+
+const seedChat = [
+    { user: 'SóiCôĐộc', color: 'text-tertiary', text: 'Ai chơi phòng 16 người không?' },
+    { user: 'TiênTri123', color: 'text-primary', text: 'Xin link phòng bạn ơi' },
+    { user: 'ThợSănĐêm', color: 'text-[#e65100]', text: 'Vào phòng #VN-8821 đi, còn thiếu 4 slot nữa' },
+    { user: 'PhápSư', color: 'text-secondary', text: 'Game này hay lắm, ai mới chưa biết luật không?' },
+    { user: 'BạchDinh', color: 'text-tertiary', text: 'Mình mới, ai chỉ với 😭' },
+];
+
+function renderSeedChat() {
+    const log = document.getElementById('chatLog');
+    if (!log) return;
+    log.innerHTML = seedChat.map(m => `
+        <div class="flex flex-col gap-1 animate-fadeIn">
+            <div class="flex items-baseline gap-2">
+                <span class="font-bold text-sm ${m.color}">${m.user}</span>
+                <span class="text-[10px] text-outline">10:42</span>
+            </div>
+            <div class="bg-surface-container rounded-lg rounded-tl-none p-2 text-sm text-on-surface inline-block max-w-[90%] break-words">${m.text}</div>
+        </div>
+    `).join('');
+    log.scrollTop = log.scrollHeight;
+}
+
+function addMessage() {
+    const input = document.getElementById('chatInput');
+    const log = document.getElementById('chatLog');
+    const text = input.value.trim();
+    if (!text) return;
+    const now = new Date();
+    const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    log.insertAdjacentHTML('beforeend', `
+        <div class="flex flex-col gap-1 animate-fadeIn">
+            <div class="flex items-baseline gap-2">
+                <span class="font-bold text-sm text-secondary">Bạn (Người Chơi)</span>
+                <span class="text-[10px] text-outline">${timeStr}</span>
+            </div>
+            <div class="bg-primary/10 border border-primary/20 rounded-lg rounded-tl-none p-2 text-sm text-on-surface inline-block max-w-[90%] break-words">${text}</div>
+        </div>
+    `);
+    input.value = '';
+    log.scrollTop = log.scrollHeight;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    renderRooms();
+    renderSeedChat();
+    renderSlots();
+});
+</script>
+</body>
+</html>
