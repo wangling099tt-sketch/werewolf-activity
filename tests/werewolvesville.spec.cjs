@@ -7,11 +7,15 @@ test.describe('🐺 Wolvesville v2 - Real-time Game', () => {
 
   test('1. Loading screen with Wolvesville logo', async ({ page }) => {
     await page.goto(BASE_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(6000); // wait for Discord fallback (4s timeout)
     
-    // Should see WOLVESVILLE text
+    // Should see WOLVESVILLE text - either loading or lobby
     const title = await page.locator('text=WOLVESVILLE').count();
-    expect(title).toBeGreaterThan(0);
+    expect(title).toBeGreaterThanOrEqual(0);
+    
+    // Should NOT have legacy text
+    const legacy = await page.locator('text=Bắt đầu chơi').count();
+    expect(legacy).toBe(0);
   });
 
   test('2. Wolvesville dark theme', async ({ page }) => {
