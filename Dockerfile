@@ -2,26 +2,25 @@ FROM node:18-alpine
 
 WORKDIR /app
 
-# Install all dependencies
+# Copy package files
 COPY package*.json ./
 COPY server/package*.json ./server/
 COPY client/package*.json ./client/
-RUN npm ci
+
+# Install dependencies
+RUN npm ci && cd server && npm ci && cd ../client && npm install
 
 # Build client
-COPY client/src ./client/src
-COPY client/index.html ./client/
-COPY client/vite.config.js ./client/
-COPY client/.env.production ./client/
-RUN cd client && npm ci && npm run build
+RUN cd client && npm run build
 
 # Copy server files
 COPY server/ ./server/
 COPY shared/ ./shared/
+
+# Copy root level files needed
 COPY server.js ./
+COPY .env.example .env 2>/dev/null || true
 
 EXPOSE 3001
 
-USER node
-
-CMD ["node", "server.js"]
+CMD ["node", "server/index.js"]

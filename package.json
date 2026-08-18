@@ -1,14 +1,16 @@
 {
   "name": "werewolf-activity",
   "version": "1.0.0",
-  "description": "Discord Activity cho Ma Sói",
-  "main": "server.js",
+  "type": "module",
+  "description": "Discord Werewolf Activity",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js"
   },
-  "type": "commonjs",
   "dependencies": {
-    "express": "^5.2.1",
-    "socket.io": "^4.8.3"
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7"
   }
 }
