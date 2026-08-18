@@ -1,11 +1,11 @@
-FROM node:18-alpine
+FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-# Copy all client files (including src for build)
+# Copy all client files first
 COPY client/ ./client/
 
-# Install dependencies and build client
+# Install and build client
 RUN cd client && npm install && npm run build
 
 # Copy server files
@@ -13,4 +13,5 @@ COPY server/ ./server/
 
 EXPOSE 3001
 
-CMD ["node", "server/index.js"]
+WORKDIR /app/server
+CMD ["node", "index.js"]
