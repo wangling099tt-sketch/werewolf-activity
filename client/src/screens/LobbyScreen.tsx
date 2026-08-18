@@ -1,13 +1,14 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Play, Users, Settings, Swords, Zap, Trophy, 
-  ChevronRight, Star, Crown, Sparkles, LogIn, List
+  ChevronRight, Star, Crown, Sparkles, LogIn, List, User
 } from 'lucide-react';
 import { useState } from 'react';
 import { getAvatarUrl } from '../hooks/useDiscordSdk';
 import { HowToPlay } from '../components/HowToPlay';
 import { RoomBrowser } from '../components/RoomBrowser';
 import { SettingsModal } from '../components/SettingsModal';
+import { ProfileModal } from '../components/ProfileModal';
 import { sound } from '../utils/sound';
 
 interface LobbyScreenProps {
@@ -35,6 +36,7 @@ export default function LobbyScreen({ discord, onCreateRoom, onJoinRoom, connect
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const [showRoomBrowser, setShowRoomBrowser] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
 
   return (
     <motion.div 
@@ -55,10 +57,13 @@ export default function LobbyScreen({ discord, onCreateRoom, onJoinRoom, connect
 
       {/* Header */}
       <motion.div variants={itemVariants} className="mb-12 text-center">
-        <div className="relative inline-block mb-4">
+        <motion.button
+          className="relative inline-block mb-4"
+          onClick={() => { sound.play('click'); setShowProfile(true); }}
+          whileHover={{ scale: 1.05 }}
+        >
           <motion.div 
             className="wv-avatar w-24 h-24"
-            whileHover={{ scale: 1.1 }}
           >
             <div className="absolute inset-0 rounded-full bg-gradient-to-br from-wv-primary to-wv-accent p-0.5">
               <img 
@@ -70,16 +75,25 @@ export default function LobbyScreen({ discord, onCreateRoom, onJoinRoom, connect
           </motion.div>
           
           <motion.div 
-            className="absolute -inset-2 rounded-full border-2 border-wv-primary/30"
+            className="absolute -inset-2 rounded-full border-2 border-wv-primary/30 pointer-events-none"
             animate={{ rotate: 360 }}
             transition={{ duration: 8, repeat: Infinity, ease: 'linear' }}
           />
           
           <div className="wv-avatar-online" />
-        </div>
+          
+          {/* Click hint */}
+          <motion.div 
+            className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-wv-text-muted opacity-50"
+            animate={{ opacity: [0.3, 0.7, 0.3] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            Tap to view profile
+          </motion.div>
+        </motion.button>
         
         <motion.h2 
-          className="text-2xl font-wv-display text-wv-text mb-1"
+          className="text-2xl font-wv-display text-wv-text mb-1 mt-4"
           variants={itemVariants}
         >
           {user?.globalName || user?.username || 'Player'}
@@ -251,6 +265,11 @@ export default function LobbyScreen({ discord, onCreateRoom, onJoinRoom, connect
       {/* Settings Modal */}
       <AnimatePresence>
         {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+      </AnimatePresence>
+
+      {/* Profile Modal */}
+      <AnimatePresence>
+        {showProfile && <ProfileModal onClose={() => setShowProfile(false)} user={user} />}
       </AnimatePresence>
     </motion.div>
   );

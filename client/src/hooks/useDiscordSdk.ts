@@ -25,7 +25,23 @@ export function useDiscordSdk() {
   useEffect(() => {
     let mounted = true;
     let retryCount = 0;
-    const maxRetries = 3;
+    const maxRetries = 2;
+
+    // Auto-fallback timeout - if Discord SDK doesn't initialize in 4s, use mock
+    const fallbackTimeout = setTimeout(() => {
+      if (!mounted) return;
+      console.log('⏱️ Discord SDK timeout, using dev mode');
+      setState({
+        status: 'authenticated',
+        user: {
+          id: 'dev_' + Math.random().toString(36).slice(2),
+          username: 'DevPlayer',
+          globalName: 'Dev Player',
+          avatar: '',
+          discriminator: '0',
+        },
+      });
+    }, 4000);
 
     async function initDiscord() {
       try {
@@ -46,6 +62,7 @@ export function useDiscordSdk() {
 
         if (code) {
           // Real Discord auth
+          clearTimeout(fallbackTimeout);
           const user = {
             id: discordSdk.user.id || 'dev_user',
             username: discordSdk.user.username || 'DevPlayer',
@@ -57,6 +74,7 @@ export function useDiscordSdk() {
           setState({ status: 'authenticated', user });
         } else {
           // Dev mode - create mock user
+          clearTimeout(fallbackTimeout);
           setState({
             status: 'authenticated',
             user: {
@@ -76,6 +94,7 @@ export function useDiscordSdk() {
         if (retryCount < maxRetries) {
           setTimeout(initDiscord, 2000);
         } else {
+          clearTimeout(fallbackTimeout);
           // Fallback to mock user for development
           setState({
             status: 'authenticated',
@@ -95,6 +114,7 @@ export function useDiscordSdk() {
 
     return () => {
       mounted = false;
+      clearTimeout(fallbackTimeout);
     };
   }, []);
 
