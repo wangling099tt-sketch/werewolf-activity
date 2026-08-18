@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -18,9 +19,17 @@ let lobbies = {};
 // Serve static files from client/dist (built React app)
 app.use(express.static(path.join(__dirname, 'client', 'dist')));
 
-// SPA fallback
-app.get('(.*)', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+// SPA fallback - serve index.html for all non-API routes
+app.use((req, res, next) => {
+  if (req.path.startsWith('/api') || req.path.startsWith('/socket.io')) {
+    return next();
+  }
+  const indexPath = path.join(__dirname, 'client', 'dist', 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    next();
+  }
 });
 
 // REST API endpoints
