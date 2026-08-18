@@ -1,7 +1,7 @@
 ﻿import { useEffect, useState, useRef } from 'react';
 import { getAvatarUrl } from '../discord.js';
 import { ROLE_META } from '../roles.js';
-import ChatPopup from './ChatPopup.jsx';
+import GameChat from './GameChat.jsx';
 
 export default function GameScene({ room, me, socket, myRole, inspect, logs, meRoleMeta }) {
   const [revealedRole, setRevealedRole] = useState(null);
@@ -11,16 +11,12 @@ export default function GameScene({ room, me, socket, myRole, inspect, logs, meR
   const players = room?.players || [];
   const alive = players.filter((p) => p.alive);
   const phase = room?.phase;
-  // Vote data
-  const voteCounts = room?.voteCounts || []; // [{ id, received }]
-  const winners = room?.winners || {}; // { targetId: [voterId,...] }
+  const voteCounts = room?.voteCounts || [];
+  const winners = room?.winners || {};
   const voteCountMap = Object.fromEntries(voteCounts.map((v) => [v.id, v.received]));
 
-  // Selected targets (for night action)
   const [selectedTargets, setSelectedTargets] = useState(new Set());
-  const [showHelp, setShowHelp] = useState(true);
 
-  // Click avatar to act (vote or night action)
   const handlePlayerClick = (p) => {
     if (!p.alive || p.id === me.id) return;
 
@@ -30,7 +26,6 @@ export default function GameScene({ room, me, socket, myRole, inspect, logs, meR
     }
 
     if (phase === 'night' && meRoleMeta?.hasNightAction && !me.hasActed) {
-      // Toggle target for night action
       setSelectedTargets((prev) => {
         const next = new Set(prev);
         if (next.has(p.id)) next.delete(p.id);
@@ -40,7 +35,6 @@ export default function GameScene({ room, me, socket, myRole, inspect, logs, meR
     }
   };
 
-  // Submit night action when button clicked
   const submitNightAction = () => {
     const targets = Array.from(selectedTargets);
     if (targets.length === 0) return;
@@ -56,7 +50,6 @@ export default function GameScene({ room, me, socket, myRole, inspect, logs, meR
     setSelectedTargets(new Set());
   };
 
-  // Role reveal: show when role is assigned
   useEffect(() => {
     if (myRole && !revealedRole) {
       setRevealedRole(myRole.role);
@@ -65,7 +58,6 @@ export default function GameScene({ room, me, socket, myRole, inspect, logs, meR
     }
   }, [myRole]);
 
-  // Night countdown timer
   useEffect(() => {
     if (phase === 'night' || phase === 'night_intro') {
       setNightTimer(30);
@@ -78,7 +70,6 @@ export default function GameScene({ room, me, socket, myRole, inspect, logs, meR
     }
   }, [phase]);
 
-  // Show action overlay after role reveal
   useEffect(() => {
     if (!phase || phase === 'ended') return;
     setShowAction(false);
@@ -90,140 +81,126 @@ export default function GameScene({ room, me, socket, myRole, inspect, logs, meR
 
   if (!room) return null;
 
-  // Dynamic radius based on player count
   const count = players.length;
   const radius = count <= 4 ? 130 : count <= 8 ? 160 : count <= 12 ? 180 : 200;
   const avatarSize = count <= 8 ? 60 : 50;
   const cx = 50, cy = 48;
 
   return (
-    <>
-      <div className="lobby-header">
-        <div className="room-info">
-          <h2 style={{ margin: 0, fontSize: 18 }}>{getPhaseEmoji(phase)} {getPhaseLabel(phase)}</h2>
-          {room.day > 0 && (
-            <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>
-              {phase?.includes('night') ? `Đêm ${room.night}` : `Ngày ${room.day}`}
-            </span>
-          )}
-        </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-          {/* Skip button - removed: phases auto-advance */}
-        </div>
-      </div>
-
-      <div className="lobby-scene">
-        <div className="player-circles" style={{ minHeight: 280, padding: '10px 0' }}>
-          {players.map((p, i) => {
-            const angle = (i / Math.max(count, 6)) * Math.PI * 2 - Math.PI / 2;
-            const x = cx + (radius / 4) * Math.cos(angle);
-            const y = cy + (radius / 4) * Math.sin(angle);
-            const isYou = p.id === me.id;
-            const isDead = !p.alive;
-            const received = voteCountMap[p.id] || 0; // votes received (only meaningful when DAY_VOTE)
-            const voterIds = winners[p.id] || [];
-            return (
-              <div
-                key={p.id}
-                className={`player-circle ${p.id === room.hostId ? 'is-host' : ''} ${isYou ? 'is-you' : ''} ${isDead ? 'is-dead' : ''} ${p.isBot ? 'is-bot' : ''} ${received > 0 ? 'is-voted' : ''} ${selectedTargets.has(p.id) ? 'is-selected' : ''}`}
-                style={{
-                  left: `${x}%`,
-                  top: `${y}%`,
-                  transform: 'translate(-50%, -50%)',
-                  cursor: (phase === 'day_vote' || (phase === 'night' && meRoleMeta?.hasNightAction && !p.isBot)) ? 'pointer' : 'default',
-                }}
-                onClick={() => handlePlayerClick(p)}
-                title={phase === 'night' && meRoleMeta?.hasNightAction ? `Click để chọn ${p.name}` : ''}
-              >
-                {/* Number of votes received ABOVE the head */}
-                {phase === 'day_vote' && received > 0 && (
-                  <div className={`vote-badge-top ${received >= 5 ? 'big' : ''}`}>
-                    {received}
-                  </div>
-                )}
-                <div className="avatar-ring" style={{
-                  width: avatarSize, height: avatarSize,
-                }}>
-                  <img src={getAvatarUrl(p.avatar || p.id)} alt={p.name} />
-                  {isDead && <div className="dead-overlay">💀</div>}
-                  {isYou && <span className="badge you-badge">★</span>}
-                </div>
-                <span className="name-pill" style={{ fontSize: 10, padding: '2px 8px' }}>
-                  {p.name.length > 12 ? p.name.slice(0, 11) + '…' : p.name}
-                </span>
-                {/* Voter avatar dots BELOW the avatar */}
-                {phase === 'day_vote' && voterIds.length > 0 && (
-                  <div className="voter-dots-row">
-                    {voterIds.slice(0, 8).map((vid) => {
-                      const v = players.find((pp) => pp.id === vid);
-                      if (!v) return null;
-                      return (
-                        <img
-                          key={vid}
-                          src={getAvatarUrl(v.avatar || v.id)}
-                          className="voter-dot"
-                          alt={v.name}
-                        />
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Center info — fixed position so always visible */}
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '0 20px 8px' }}>
-          <div className="center-card">
-            <div className="phase-h1">{getPhaseLabel(phase)}</div>
-            <div className="phase-sub">
-              {phase === 'night' && `Vai đặc biệt đang hành động · ${nightTimer}s`}
-              {phase === 'night_intro' && 'Đêm bắt đầu'}
-              {phase === 'night_results' && '☀️ Đã có người chết'}
-              {phase === 'day_discuss' && '💬 Thảo luận ai là sói'}
-              {phase === 'day_vote' && `🗳 Đã vote ${room.voteCount}/${room.voteTotal} · ${nightTimer}s`}
-              {phase === 'day_results' && '⚖ Kết quả vote'}
-              {phase === 'ended' && room.winner && `🏆 ${winnerLabel(room.winner)}`}
-            </div>
-            {(phase?.includes('night') || phase === 'day_vote') && (
-              <div className="timer-bar">
-                <div style={{ width: `${(nightTimer / 30) * 100}%` }} />
-              </div>
+    <div className="game-layout">
+      <div className="game-area">
+        <div className="lobby-header">
+          <div className="room-info">
+            <h2 style={{ margin: 0, fontSize: 18 }}>{getPhaseEmoji(phase)} {getPhaseLabel(phase)}</h2>
+            {room.day > 0 && (
+              <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>
+                {phase?.includes('night') ? `Đêm ${room.night}` : `Ngày ${room.day}`}
+              </span>
             )}
           </div>
         </div>
 
-        {/* Bottom action area: just the action overlay, chat is a popup */}
-        <div className="game-bottom-area">
-          {showAction && phase === 'night' && meRoleMeta && (
-            <NightActionOverlay
-              players={alive}
-              me={me}
-              myRole={myRole}
-              socket={socket}
-              inspect={inspect}
-              selectedTargets={selectedTargets}
-              submitNightAction={submitNightAction}
-            />
-          )}
+        <div className="lobby-scene">
+          <div className="player-circles" style={{ minHeight: 280, padding: '10px 0' }}>
+            {players.map((p, i) => {
+              const angle = (i / Math.max(count, 6)) * Math.PI * 2 - Math.PI / 2;
+              const x = cx + (radius / 4) * Math.cos(angle);
+              const y = cy + (radius / 4) * Math.sin(angle);
+              const isYou = p.id === me.id;
+              const isDead = !p.alive;
+              const received = voteCountMap[p.id] || 0;
+              const voterIds = winners[p.id] || [];
+              return (
+                <div
+                  key={p.id}
+                  className={`player-circle ${p.id === room.hostId ? 'is-host' : ''} ${isYou ? 'is-you' : ''} ${isDead ? 'is-dead' : ''} ${p.isBot ? 'is-bot' : ''} ${received > 0 ? 'is-voted' : ''} ${selectedTargets.has(p.id) ? 'is-selected' : ''}`}
+                  style={{
+                    left: `${x}%`,
+                    top: `${y}%`,
+                    transform: 'translate(-50%, -50%)',
+                    cursor: (phase === 'day_vote' || (phase === 'night' && meRoleMeta?.hasNightAction && !p.isBot)) ? 'pointer' : 'default',
+                  }}
+                  onClick={() => handlePlayerClick(p)}
+                  title={phase === 'night' && meRoleMeta?.hasNightAction ? `Chọn ${p.name}` : ''}
+                >
+                  {phase === 'day_vote' && received > 0 && (
+                    <div className={`vote-badge-top ${received >= 5 ? 'big' : ''}`}>
+                      {received}
+                    </div>
+                  )}
+                  <div className="avatar-ring" style={{ width: avatarSize, height: avatarSize }}>
+                    <img src={getAvatarUrl(p.avatar || p.id)} alt={p.name} />
+                    {isDead && <div className="dead-overlay">💀</div>}
+                    {isYou && <span className="badge">★</span>}
+                  </div>
+                  <span className="name-pill" style={{ fontSize: 10, padding: '2px 8px' }}>
+                    {p.name.length > 12 ? p.name.slice(0, 11) + '…' : p.name}
+                  </span>
+                  {phase === 'day_vote' && voterIds.length > 0 && (
+                    <div className="voter-dots-row">
+                      {voterIds.slice(0, 8).map((vid) => {
+                        const v = players.find((pp) => pp.id === vid);
+                        if (!v) return null;
+                        return (
+                          <img key={vid} src={getAvatarUrl(v.avatar || v.id)} className="voter-dot" alt={v.name} />
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
 
-          {showAction && phase === 'day_vote' && (
-            <DayVoteOverlay players={alive} me={me} socket={socket} />
-          )}
+          <div style={{ display: 'flex', justifyContent: 'center', padding: '0 20px 8px' }}>
+            <div className="center-card">
+              <div className="phase-h1">{getPhaseLabel(phase)}</div>
+              <div className="phase-sub">
+                {phase === 'night' && `Vai đặc biệt đang hành động · ${nightTimer}s`}
+                {phase === 'night_intro' && 'Đêm bắt đầu'}
+                {phase === 'night_results' && '☀️ Đã có người chết'}
+                {phase === 'day_discuss' && '💬 Thảo luận ai là sói'}
+                {phase === 'day_vote' && `🗳 Đã vote ${room.voteCount}/${room.voteTotal} · ${nightTimer}s`}
+                {phase === 'day_results' && '⚖ Kết quả vote'}
+                {phase === 'ended' && room.winner && `🏆 ${winnerLabel(room.winner)}`}
+              </div>
+              {(phase?.includes('night') || phase === 'day_vote') && (
+                <div className="timer-bar">
+                  <div style={{ width: `${(nightTimer / 30) * 100}%` }} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="game-bottom-area">
+            {showAction && phase === 'night' && meRoleMeta && (
+              <NightActionOverlay
+                players={alive}
+                me={me}
+                myRole={myRole}
+                socket={socket}
+                inspect={inspect}
+                selectedTargets={selectedTargets}
+                submitNightAction={submitNightAction}
+              />
+            )}
+
+            {showAction && phase === 'day_vote' && (
+              <DayVoteOverlay players={alive} me={me} socket={socket} />
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Role reveal modal */}
+      {/* Integrated Chat Box - Desktop: sidebar, Mobile: bottom */}
+      <GameChat logs={logs} socket={socket} me={me} phase={phase} />
+
       {revealedRole && (
         <RoleReveal role={revealedRole} myRole={myRole} onDismiss={() => setRevealedRole(null)} />
       )}
 
       {phase === 'ended' && <EndOverlay room={room} />}
-
-      {/* Chat popup - floating button bottom-right */}
-      <ChatPopup logs={logs} socket={socket} me={me} phase={phase} />
-    </>
+    </div>
   );
 }
 
@@ -391,10 +368,6 @@ function getDesc(role) {
     arsonist: 'Tẩm dầu 1 người/đêm.',
   };
   return m[role] || 'Vai trò đặc biệt.';
-}
-
-function isSystemLog(text) {
-  return /^[🌙☀️🗳⚰💀🛡🧪🔮☠💕🎵👤🐺🌟⚖🔍]/.test(text);
 }
 
 function getPhaseEmoji(p) {
