@@ -14,7 +14,8 @@ COPY shared/ ./shared/
 
 # Copy root level files needed
 COPY server.js ./
-COPY .env.example .env 2>/dev/null || true
+# .env.example is optional - skip if not present
+COPY .env.example* .env.example 2>/dev/null || true
 
 EXPOSE 3001
 
