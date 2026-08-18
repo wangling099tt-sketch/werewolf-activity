@@ -1,0 +1,131 @@
+/* ============================================
+   WEREWOLF GAME - UI/UX THEME SYSTEM
+   Modern Dark/Mystic Gaming Theme
+   ============================================ */
+
+:root {
+  /* ===== DAY THEME ===== */
+  --day-bg-primary: #e8d5b7;
+  --day-bg-secondary: #c4a574;
+  --day-bg-gradient: linear-gradient(135deg, #f5e6d3 0%, #e8d5b7 50%, #d4c4a8 100%);
+  --day-text-primary: #3d2914;
+  --day-text-secondary: #5a3d1a;
+  --day-accent: #8b5a2b;
+  --day-accent-hover: #a0522d;
+  --day-wood-light: #deb887;
+  --day-wood-dark: #8b7355;
+  --day-wood-shadow: rgba(60, 40, 20, 0.3);
+  --day-sky-color: #87ceeb;
+  --day-sun-glow: #ffd700;
+
+  /* ===== NIGHT THEME ===== */
+  --night-bg-primary: #1a1a2e;
+  --night-bg-secondary: #16213e;
+  --night-bg-gradient: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+  --night-text-primary: #e8e8e8;
+  --night-text-secondary: #a0a0a0;
+  --night-accent: #9b59b6;
+  --night-accent-hover: #8e44ad;
+  --night-wood-light: #4a3728;
+  --night-wood-dark: #2d2117;
+  --night-wood-shadow: rgba(0, 0, 0, 0.5);
+  --night-moon-glow: #f4f6f0;
+  --night-stars: #ffffff;
+
+  /* ===== SHARED GAMING VARIABLES ===== */
+  --button-primary: linear-gradient(145deg, #9b59b6, #8e44ad);
+  --button-secondary: linear-gradient(145deg, #3498db, #2980b9);
+  --button-danger: linear-gradient(145deg, #e74c3c, #c0392b);
+  --button-success: linear-gradient(145deg, #27ae60, #1e8449);
+
+  --shadow-3d: 0 6px 0 rgba(0, 0, 0, 0.3), 0 8px 20px rgba(0, 0, 0, 0.2);
+  --shadow-glow: 0 0 20px rgba(155, 89, 182, 0.5);
+  --shadow-glow-pulse: 0 0 20px rgba(155, 89, 182, 0.5), 0 0 40px rgba(155, 89, 182, 0.3);
+
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  --border-radius-sm: 8px;
+  --border-radius-md: 12px;
+  --border-radius-lg: 20px;
+  --border-radius-xl: 30px;
+
+  --font-primary: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Creepster', 'Nunito', cursive;
+  --font-mono: 'Fira Code', 'Consolas', monospace;
+
+  /* ===== CURRENT THEME (default to day) ===== */
+  --bg-primary: var(--day-bg-primary);
+  --bg-secondary: var(--day-bg-secondary);
+  --bg-gradient: var(--day-bg-gradient);
+  --text-primary: var(--day-text-primary);
+  --text-secondary: var(--day-text-secondary);
+  --accent: var(--day-accent);
+  --accent-hover: var(--day-accent-hover);
+  --wood-light: var(--day-wood-light);
+  --wood-dark: var(--day-wood-dark);
+  --wood-shadow: var(--day-wood-shadow);
+}
+
+/* ===== THEME SWITCHING ===== */
+[data-theme="day"] {
+  --bg-primary: var(--day-bg-primary);
+  --bg-secondary: var(--day-bg-secondary);
+  --bg-gradient: var(--day-bg-gradient);
+  --text-primary: var(--day-text-primary);
+  --text-secondary: var(--day-text-secondary);
+  --accent: var(--day-accent);
+  --accent-hover: var(--day-accent-hover);
+  --wood-light: var(--day-wood-light);
+  --wood-dark: var(--day-wood-dark);
+  --wood-shadow: var(--day-wood-shadow);
+}
+
+[data-theme="night"] {
+  --bg-primary: var(--night-bg-primary);
+  --bg-secondary: var(--night-bg-secondary);
+  --bg-gradient: var(--night-bg-gradient);
+  --text-primary: var(--night-text-primary);
+  --text-secondary: var(--night-text-secondary);
+  --accent: var(--night-accent);
+  --accent-hover: var(--night-accent-hover);
+  --wood-light: var(--night-wood-light);
+  --wood-dark: var(--night-wood-dark);
+  --wood-shadow: var(--night-wood-shadow);
+}
+
+/* ===== BASE STYLES ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-primary);
+  background: var(--bg-gradient);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background var(--transition-slow), color var(--transition-normal);
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+:root {
+  --mobile-max: 480px;
+  --tablet-min: 481px;
+  --tablet-max: 768px;
+  --desktop-min: 769px;
+}
+
+@media (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+}

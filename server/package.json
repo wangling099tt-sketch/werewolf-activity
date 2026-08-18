@@ -1,0 +1,17 @@
+{
+  "name": "werewolf-activity-server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Discord Werewolf Activity - Game Server",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7"
+  }
+}
