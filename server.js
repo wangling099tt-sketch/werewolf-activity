@@ -1,56 +1,55 @@
+const express = require('express');
 const http = require('http');
-const fs = require('fs');
 const path = require('path');
 
-const PORT = process.env.PORT || 3000;
+const app = express();
+const PORT = process.env.PORT || 3001;
 
-const mimeTypes = {
-  '.html': 'text/html',
-  '.js': 'application/javascript',
-  '.css': 'text/css',
-  '.json': 'application/json',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.gif': 'image/gif',
-  '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon',
-  '.woff': 'font/woff',
-  '.woff2': 'font/woff2'
-};
+app.use(express.json());
 
-const server = http.createServer((req, res) => {
-  console.log(`${req.method} ${req.url}`);
+const server = http.createServer(app);
+const io = require('socket.io')(server, {
+  cors: { origin: '*' }
+});
 
-  let filePath = req.url === '/' ? '/index.html' : req.url;
-  filePath = path.join(__dirname, 'client', filePath);
+let games = {};
+let lobbies = {};
 
-  const ext = path.extname(filePath);
-  const contentType = mimeTypes[ext] || 'application/octet-stream';
+// Serve static files from client/dist (built React app)
+app.use(express.static(path.join(__dirname, 'client', 'dist')));
 
-  fs.readFile(filePath, (err, content) => {
-    if (err) {
-      if (err.code === 'ENOENT') {
-        // Serve index.html for SPA routing
-        fs.readFile(path.join(__dirname, 'client', 'index.html'), (err, content) => {
-          if (err) {
-            res.writeHead(500);
-            res.end('Server Error');
-          } else {
-            res.writeHead(200, { 'Content-Type': 'text/html' });
-            res.end(content);
-          }
-        });
-      } else {
-        res.writeHead(500);
-        res.end('Server Error');
-      }
-    } else {
-      res.writeHead(200, { 'Content-Type': contentType });
-      res.end(content);
+// SPA fallback
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+});
+
+// REST API endpoints
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+
+// Socket.IO game logic
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+
+  socket.on('create-lobby', () => {
+    const lobbyId = Math.random().toString(36).substring(2, 8).toUpperCase();
+    lobbies[lobbyId] = { players: [], settings: {} };
+    socket.emit('lobby-created', lobbyId);
+  });
+
+  socket.on('join-lobby', (lobbyId) => {
+    if (lobbies[lobbyId]) {
+      lobbies[lobbyId].players.push(socket.id);
+      socket.join(lobbyId);
+      socket.emit('joined-lobby', lobbyId);
+      io.to(lobbyId).emit('player-joined', socket.id);
     }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected:', socket.id);
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}/`);
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
 });
