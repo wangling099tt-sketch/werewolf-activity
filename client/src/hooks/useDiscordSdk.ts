@@ -8,13 +8,20 @@ interface DiscordUser {
   discriminator: string;
 }
 
+interface DiscordActivityInfo {
+  channelId: string | null;
+  guildId: string | null;
+  applicationId: string | null;
+}
+
 interface DiscordSdkState {
   status: 'loading' | 'error' | 'authenticated';
   user: DiscordUser | null;
+  activity?: DiscordActivityInfo;
   error?: string;
 }
 
-const CLIENT_ID = import.meta.env.VITE_DISCORD_CLIENT_ID || '1414397182890606665';
+const CLIENT_ID = (import.meta.env.VITE_DISCORD_CLIENT_ID as string) || '1414397182890606665';
 
 export function useDiscordSdk() {
   const [state, setState] = useState<DiscordSdkState>({
@@ -26,6 +33,22 @@ export function useDiscordSdk() {
     let mounted = true;
     let retryCount = 0;
     const maxRetries = 2;
+
+    // Check if running in Discord iframe
+    const isInDiscord = typeof window !== 'undefined' && (
+      // Discord injects __DISCORD__ or has iframe parent
+      (window as any).__DISCORD__ !== undefined ||
+      (window as any).DiscordSDK !== undefined ||
+      // Check parent window origin
+      (() => {
+        try {
+          return window.parent !== window && 
+                 new URL(window.parent.location.href).hostname.includes('discord');
+        } catch (e) {
+          return false;
+        }
+      })()
+    );
 
     // Auto-fallback timeout - if Discord SDK doesn't initialize in 4s, use mock
     const fallbackTimeout = setTimeout(() => {
@@ -40,41 +63,68 @@ export function useDiscordSdk() {
           avatar: '',
           discriminator: '0',
         },
+        activity: {
+          channelId: null,
+          guildId: null,
+          applicationId: CLIENT_ID,
+        },
       });
-    }, 4000);
+    }, isInDiscord ? 10000 : 4000);
 
     async function initDiscord() {
       try {
         // Dynamic import to handle non-Discord environments
         const { DiscordSDK } = await import('@discord/embedded-app-sdk');
         const discordSdk = new DiscordSDK(CLIENT_ID);
+        
+        // Expose for debugging
+        (window as any).__discordSdk = discordSdk;
 
         await discordSdk.ready();
         
         if (!mounted) return;
 
-        // For development without real Discord, use mock user
+        // Try to authenticate - this only works inside Discord iframe
         const { code } = await discordSdk.commands.authenticate({
           access_token: 'dev_token_' + Date.now(),
         });
 
         if (!mounted) return;
 
+        clearTimeout(fallbackTimeout);
+        
         if (code) {
-          // Real Discord auth
-          clearTimeout(fallbackTimeout);
-          const user = {
-            id: discordSdk.user.id || 'dev_user',
-            username: discordSdk.user.username || 'DevPlayer',
-            globalName: discordSdk.user.globalName || 'Dev Player',
-            avatar: discordSdk.user.avatar || '',
-            discriminator: discordSdk.user.discriminator || '0',
+          // Real Discord auth - we have a code, but we need to exchange it for user info
+          // In real Discord Activity, the parent iframe provides user info via discordSdk.user
+          const user = (discordSdk as any).user || {
+            id: 'discord_' + Math.random().toString(36).slice(2),
+            username: 'DiscordUser',
+            globalName: 'Discord User',
+            avatar: '',
+            discriminator: '0',
           };
           
-          setState({ status: 'authenticated', user });
+          // Get activity info from URL/iframe
+          const channelId = (discordSdk as any).channelId || new URLSearchParams(window.location.search).get('channel_id');
+          const guildId = (discordSdk as any).guildId || new URLSearchParams(window.location.search).get('guild_id');
+          
+          setState({
+            status: 'authenticated',
+            user: {
+              id: user.id,
+              username: user.username,
+              globalName: user.globalName || user.username,
+              avatar: user.avatar,
+              discriminator: user.discriminator || '0',
+            },
+            activity: {
+              channelId,
+              guildId,
+              applicationId: CLIENT_ID,
+            },
+          });
         } else {
           // Dev mode - create mock user
-          clearTimeout(fallbackTimeout);
           setState({
             status: 'authenticated',
             user: {
@@ -83,6 +133,11 @@ export function useDiscordSdk() {
               globalName: 'Dev Player',
               avatar: '',
               discriminator: '0',
+            },
+            activity: {
+              channelId: null,
+              guildId: null,
+              applicationId: CLIENT_ID,
             },
           });
         }
@@ -105,6 +160,11 @@ export function useDiscordSdk() {
               avatar: '',
               discriminator: '0',
             },
+            activity: {
+              channelId: null,
+              guildId: null,
+              applicationId: CLIENT_ID,
+            },
           });
         }
       }
@@ -123,7 +183,6 @@ export function useDiscordSdk() {
 
 export function getAvatarUrl(userId: string, avatar: string, size = 128): string {
   if (!avatar) {
-    // Default avatar based on discriminator
     const defaultIndex = parseInt(userId || '0') % 6;
     return `https://cdn.discordapp.com/embed/avatars/${defaultIndex}.png`;
   }

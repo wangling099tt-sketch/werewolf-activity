@@ -8,6 +8,7 @@ import { getAvatarUrl } from '../hooks/useDiscordSdk';
 import { sound } from '../utils/sound';
 import { SlashOverlay, LightningBolt } from '../components/DeathAnimations';
 import { useToast } from '../components/Toast';
+import { DiscordActivityBadge, VoicePanel } from '../components/DiscordComponents';
 import type { Socket } from 'socket.io-client';
 
 interface GameplayScreenProps {
@@ -242,6 +243,14 @@ export default function GameplayScreen({ discord, publicState, privateState, ins
           <SlashOverlay key="slash" />
         )}
       </AnimatePresence>
+
+      {/* Discord Activity badge */}
+      <DiscordActivityBadge activity={(discord as any).activity} />
+
+      {/* Voice Panel for Discord users */}
+      <div className="fixed top-20 right-4 w-64 z-20 hidden lg:block">
+        <VoicePanel />
+      </div>
 
       {/* Chat (always visible during day/vote) */}
       {(phase === 'DAY_DISCUSS' || phase === 'DAY_VOTE') && (
