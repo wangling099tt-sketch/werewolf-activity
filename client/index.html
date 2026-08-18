@@ -46,18 +46,209 @@
       flex-direction: column;
     }
     
-    /* Demo Badge */
+    /* ===== Demo Badge - REAL Image from postimg.cc ===== */
     .demo-badge {
       position: fixed;
       bottom: 1rem;
       left: 1rem;
       z-index: 999;
-      background: rgba(155, 89, 182, 0.9);
+      background: rgba(0,0,0,0.7);
       color: white;
-      padding: 0.5rem 1rem;
+      padding: 0.5rem 0.75rem;
       border-radius: 20px;
       font-size: 0.8rem;
       font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      backdrop-filter: blur(10px);
+    }
+    
+    /* Reference Image Thumbnails */
+    .ref-img {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      z-index: 999;
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      border: 2px solid var(--accent);
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .ref-img:hover {
+      transform: scale(1.1) rotate(2deg);
+      box-shadow: 0 12px 28px var(--accent);
+    }
+    
+    .ref-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    /* ===== Image 1: Loading screen with REAL reference loading icon ===== */
+    .loading-real-image {
+      position: absolute;
+      top: 18%;
+      right: 8%;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      border: 4px solid var(--accent);
+      overflow: hidden;
+      box-shadow: 0 0 40px rgba(155, 89, 182, 0.6);
+      animation: logoFloat 3s ease-in-out infinite;
+      animation-delay: 0.5s;
+    }
+    
+    .loading-real-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    /* ===== Image 2: Lobby background card with REAL lobby image ===== */
+    .lobby-real-image {
+      position: absolute;
+      top: 5%;
+      right: 5%;
+      width: 200px;
+      height: 140px;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 3px solid var(--accent);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.4);
+      transform: rotate(3deg);
+      transition: transform 0.4s ease;
+    }
+    
+    [data-theme="day"] .lobby-real-image {
+      box-shadow: 0 12px 32px rgba(155, 89, 182, 0.3);
+    }
+    
+    .lobby:hover .lobby-real-image {
+      transform: rotate(0deg) scale(1.05);
+    }
+    
+    .lobby-real-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    /* ===== Image 3 & 4: Waiting room with REAL day/night scenes ===== */
+    .waiting-scene-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      border-radius: var(--border-radius-lg);
+      opacity: 0.4;
+      transition: opacity 0.6s ease;
+    }
+    
+    [data-theme="night"] .waiting-scene-bg {
+      opacity: 0.6;
+    }
+    
+    .waiting-scene-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    
+    .waiting-room:hover .waiting-scene-bg img {
+      transform: scale(1.05);
+    }
+    
+    .waiting-position-relative {
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* ===== Image 5: Chat box style with REAL chat reference ===== */
+    .chat-preview-mini {
+      position: absolute;
+      top: -50px;
+      right: 0;
+      width: 80px;
+      height: 80px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--accent);
+      opacity: 0.7;
+      transition: all 0.3s ease;
+    }
+    
+    .chat-container:hover .chat-preview-mini {
+      opacity: 1;
+      transform: scale(1.1) rotate(-3deg);
+    }
+    
+    .chat-preview-mini img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    /* Reference Gallery Modal */
+    .ref-gallery {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.9);
+      z-index: 10000;
+      padding: 2rem;
+      overflow-y: auto;
+      backdrop-filter: blur(10px);
+    }
+    
+    .ref-gallery.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+    
+    .ref-gallery-close {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 24px;
+      font-weight: 700;
+      cursor: pointer;
+      z-index: 10001;
+    }
+    
+    .ref-gallery h2 {
+      color: var(--accent);
+      font-family: var(--font-display);
+      margin: 1rem 0;
+    }
+    
+    .ref-gallery img {
+      max-width: 90vw;
+      max-height: 60vh;
+      border-radius: 16px;
+      border: 3px solid var(--accent);
+      box-shadow: 0 0 40px rgba(155, 89, 182, 0.5);
+    }
+    
+    .ref-gallery p {
+      color: white;
+      max-width: 600px;
+      text-align: center;
+      font-size: 0.95rem;
     }
   </style>
 </head>
@@ -86,6 +277,11 @@
     <div class="loading-screen" id="loadingScreen">
       <div class="loading-glow"></div>
       <div class="loading-glow"></div>
+      
+      <!-- Image 1: REAL loading reference from postimg.cc -->
+      <div class="loading-real-image">
+        <img src="https://i.postimg.cc/XvZyYKZf/load.jpg" alt="Loading Reference" onerror="this.style.display='none'">
+      </div>
       
       <div class="loading-logo">
         <svg viewBox="0 0 100 100">
@@ -132,6 +328,11 @@
   <!-- ===== SCREEN 2: LOBBY ===== -->
   <div id="screen-lobby" class="screen">
     <div class="lobby">
+      <!-- Image 2: REAL lobby reference from postimg.cc -->
+      <div class="lobby-real-image">
+        <img src="https://i.postimg.cc/d3gS3n36/loppy.jpg" alt="Lobby Reference" onerror="this.parentElement.style.display='none'">
+      </div>
+      
       <div class="lobby-header">
         <h1 class="lobby-title">🐺 Werewolf</h1>
         <p class="lobby-subtitle">Social Deduction Game</p>
@@ -157,13 +358,20 @@
   <!-- ===== SCREEN 3: WAITING ROOM ===== -->
   <div id="screen-waiting" class="screen">
     <div class="waiting-room">
-      <div class="room-header">
-        <div class="room-info">
-          <h2 class="room-name">🏠 Phòng Của Lucas</h2>
-          <span class="room-code">📋 WER-2847</span>
-        </div>
-        <span class="room-players-count" id="playerCount">5/10 người chơi</span>
+      <!-- Image 3 & 4: REAL day/night scene from postimg.cc -->
+      <div class="waiting-scene-bg">
+        <img class="waiting-img-day" src="https://i.postimg.cc/D0N9nKRY/trong-tran-1.jpg" alt="Day Scene" onerror="this.style.display='none'">
+        <img class="waiting-img-night" src="https://i.postimg.cc/mgj0gCxp/trong-tran-2.jpg" alt="Night Scene" style="display:none" onerror="this.style.display='none'">
       </div>
+      
+      <div class="waiting-position-relative">
+        <div class="room-header">
+          <div class="room-info">
+            <h2 class="room-name">🏠 Phòng Của Lucas</h2>
+            <span class="room-code">📋 WER-2847</span>
+          </div>
+          <span class="room-players-count" id="playerCount">5/10 người chơi</span>
+        </div>
       
       <div class="player-slots" id="playerSlots"></div>
       
@@ -187,6 +395,7 @@
           Bắt Đầu Chơi
         </button>
       </div>
+      </div><!-- /waiting-position-relative -->
     </div>
   </div>
 
@@ -245,6 +454,11 @@
       
       <!-- Chat Box - Desktop: Side -->
       <div class="chat-container">
+        <!-- Image 5: REAL chat reference thumbnail -->
+        <div class="chat-preview-mini">
+          <img src="https://i.postimg.cc/768MvtBd/Gameeeeeeee.jpg" alt="Chat Reference" onerror="this.parentElement.style.display='none'">
+        </div>
+        
         <div class="chat-header">
           <span class="chat-title">
             <svg viewBox="0 0 24 24">
@@ -352,7 +566,51 @@
     </div>
   </div>
 
-  <div class="demo-badge">🎮 Werewolf Activity Demo</div>
+  <div class="demo-badge" onclick="openRefGallery()">
+    <span>🎨</span>
+    <span>Werewolf Activity</span>
+  </div>
+  
+  <!-- Reference Image Thumbnail (click to open gallery) -->
+  <div class="ref-img" onclick="openRefGallery()" title="View Reference Images">
+    <img id="refThumbImg" src="https://i.postimg.cc/d3gS3n36/loppy.jpg" alt="Reference" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22><text y=%2220%22 font-size=%2220%22>🎨</text></svg>'">
+  </div>
+  
+  <!-- ===== REFERENCE GALLERY MODAL ===== -->
+  <div class="ref-gallery" id="refGallery">
+    <button class="ref-gallery-close" onclick="closeRefGallery()">✕ Đóng</button>
+    <h2>🎨 5 Reference Images</h2>
+    
+    <div class="ref-gallery-item">
+      <h3 style="color: white;">1️⃣ SDK Loading Screen</h3>
+      <img src="https://i.postimg.cc/XvZyYKZf/load.jpg" alt="Loading" onerror="this.alt='Cannot load image'">
+      <p>Modern loading indicator với progress bar + pulse animation cho "Loading SDK..." state</p>
+    </div>
+    
+    <div class="ref-gallery-item">
+      <h3 style="color: white;">2️⃣ Lobby / Main Waiting</h3>
+      <img src="https://i.postimg.cc/d3gS3n36/loppy.jpg" alt="Lobby" onerror="this.alt='Cannot load image'">
+      <p>High-end responsive lobby với prominent "Tạo Phòng" / "Tìm Phòng" buttons</p>
+    </div>
+    
+    <div class="ref-gallery-item">
+      <h3 style="color: white;">3️⃣ In-Game Room - Day Phase</h3>
+      <img src="https://i.postimg.cc/D0N9nKRY/trong-tran-1.jpg" alt="Day" onerror="this.alt='Cannot load image'">
+      <p>Dynamic wooden blocks → stickman spawn on top với Discord username floating above</p>
+    </div>
+    
+    <div class="ref-gallery-item">
+      <h3 style="color: white;">4️⃣ In-Game Room - Night Phase</h3>
+      <img src="https://i.postimg.cc/mgj0gCxp/trong-tran-2.jpg" alt="Night" onerror="this.alt='Cannot load image'">
+      <p>Same layout dark theme với seamless Day/Night transition qua CSS variables</p>
+    </div>
+    
+    <div class="ref-gallery-item">
+      <h3 style="color: white;">5️⃣ Chat Box Concept</h3>
+      <img src="https://i.postimg.cc/768MvtBd/Gameeeeeeee.jpg" alt="Chat" onerror="this.alt='Cannot load image'">
+      <p>Native embedded chat - PC: sidebar | Mobile: bottom. No separate bot chat anymore</p>
+    </div>
+  </div>
 
   <script>
     // ===== THEME TOGGLE =====
@@ -371,7 +629,42 @@
         sunIcon.style.display = 'none';
         moonIcon.style.display = 'block';
       }
+      
+      // Swap waiting room image (Day vs Night)
+      const dayImg = document.querySelector('.waiting-img-day');
+      const nightImg = document.querySelector('.waiting-img-night');
+      if (dayImg && nightImg) {
+        if (newTheme === 'night') {
+          dayImg.style.display = 'none';
+          nightImg.style.display = 'block';
+        } else {
+          dayImg.style.display = 'block';
+          nightImg.style.display = 'none';
+        }
+      }
+      
+      // Update reference thumbnail
+      const refThumb = document.getElementById('refThumbImg');
+      if (refThumb) {
+        refThumb.src = newTheme === 'night' 
+          ? 'https://i.postimg.cc/mgj0gCxp/trong-tran-2.jpg'
+          : 'https://i.postimg.cc/d3gS3n36/loppy.jpg';
+      }
     }
+    
+    // ===== REFERENCE GALLERY =====
+    function openRefGallery() {
+      document.getElementById('refGallery').classList.add('active');
+    }
+    
+    function closeRefGallery() {
+      document.getElementById('refGallery').classList.remove('active');
+    }
+    
+    // Close gallery on ESC key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeRefGallery();
+    });
     
     // ===== SCREEN NAVIGATION =====
     function showScreen(screenId) {
